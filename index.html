@@ -16,6 +16,28 @@
 
   #app { width:min(920px, 92vw); cursor: default; display: flex; flex-direction: column; gap: 15px; position: relative; }
 
+  /* ЭКРАН РЕГИСТРАЦИИ */
+  #registerScreen {
+    position: absolute; inset: -20px;
+    background: #0d0e21;
+    z-index: 300; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border-radius: 24px; color: #fff; text-align: center; padding: 40px;
+  }
+  #registerScreen h2 { font-size: 36px; font-weight: 800; margin-bottom: 12px; background: linear-gradient(135deg, #7ee8fa, #eec0c6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  #registerScreen p { font-size: 15px; color: rgba(255,255,255,0.75); margin-bottom: 25px; }
+  #usernameInput {
+    padding: 16px 20px; font-size: 18px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05); color: #fff; width: 100%; max-width: 320px; text-align: center;
+    margin-bottom: 20px; font-weight: 600; outline: none; transition: border-color 0.2s;
+  }
+  #usernameInput:focus { border-color: #7ee8fa; box-shadow: 0 0 15px rgba(126,232,250,0.2); }
+  #saveUserBtn {
+    padding: 14px 40px; font-size: 16px; font-weight: 700; color: #0b0c1f;
+    background: linear-gradient(135deg, #7ee8fa, #eec0c6); border: none; border-radius: 14px;
+    cursor: pointer; box-shadow: 0 10px 25px rgba(126,232,250,0.3); transition: all 0.2s;
+  }
+  #saveUserBtn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(126,232,250,0.5); }
+
   /* Приветственный экран / Стартовое меню */
   #welcomeScreen {
     position: absolute; inset: -20px;
@@ -52,47 +74,24 @@
     font-size:20px; font-weight:700; color:#eec0c6; text-shadow: 0 0 10px rgba(238,192,198,0.5);
   }
 
-  /* Текст в воздухе */
+  /* Текст */
   #textViewport {
-    position:relative;
-    font-size:36px;
-    letter-spacing:0.5px;
-    color:rgba(255,255,255,0.35);
-    font-family:'Consolas','Courier New',monospace;
-    padding:20px 38px;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    user-select:none;
-    height:150px;
-    overflow:hidden;
-    animation: fadeInApp 0.6s ease-out;
+    position:relative; font-size:36px; letter-spacing:0.5px; color:rgba(255,255,255,0.35);
+    font-family:'Consolas','Courier New',monospace; padding:20px 38px; height:150px; overflow:hidden; user-select:none;
   }
   #textInner {
-    position:relative;
-    display:flex;
-    flex-wrap:wrap;
-    align-content:flex-start;
-    max-width:820px;
-    line-height:54px;
-    transition: transform .25s cubic-bezier(0.25, 1, 0.5, 1);
-    will-change: transform;
-    pointer-events: none;
-    font-weight: 600;
+    position:relative; display:flex; flex-wrap:wrap; align-content:flex-start; max-width:820px; line-height:54px;
+    transition: transform .25s cubic-bezier(0.25, 1, 0.5, 1); will-change: transform; pointer-events: none; font-weight: 600;
   }
   #textInner span { white-space:pre; transition: color 0.12s ease, background 0.12s ease; }
   #textInner .correct { color:#8bf7a0; text-shadow: 0 0 15px rgba(139,247,160,0.6); }
   #textInner .wrong { color:#ff6b81; background: rgba(255,107,129,0.25); border-radius:4px; text-shadow: 0 0 10px rgba(255,107,129,0.5); }
   
   #caret {
-    position:absolute; top:0; left:0;
-    width:3px; height:38px;
-    background:#7ee8fa;
-    box-shadow:0 0 12px rgba(126,232,250,0.8);
-    border-radius:2px;
+    position:absolute; top:0; left:0; width:3px; height:38px; background:#7ee8fa;
+    box-shadow:0 0 12px rgba(126,232,250,0.8); border-radius:2px;
     transition: top 0.12s cubic-bezier(0.25, 1, 0.5, 1), left 0.08s cubic-bezier(0.25, 1, 0.5, 1);
-    animation: caretBlink 1s step-end infinite;
-    pointer-events:none;
+    animation: caretBlink 1s step-end infinite; pointer-events:none;
   }
   @keyframes caretBlink { 0%,49%{ opacity:1; } 50%,100%{ opacity:0.15; } }
   @keyframes fadeInApp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
@@ -111,7 +110,6 @@
   .diffBtn:hover, .selectBtn:hover, #ratingOpenBtn:hover { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3); }
   .diffBtn.active { background: rgba(126,232,250,0.2); color:#7ee8fa; border-color: rgba(126,232,250,0.5); box-shadow: 0 4px 15px rgba(126,232,250,0.2); }
   
-  /* Золотая кнопка рейтинга */
   #ratingOpenBtn { background: rgba(255, 202, 40, 0.08); color: #ffca28; border-color: rgba(255, 202, 40, 0.2); }
   #ratingOpenBtn:hover { background: rgba(255, 202, 40, 0.2); border-color: #ffca28; box-shadow: 0 4px 15px rgba(255, 202, 40, 0.2); }
 
@@ -121,24 +119,22 @@
   }
   #restartBtn:hover { color: #7ee8fa; transform: rotate(180deg); }
 
-  /* Меню выбора сложности */
+  /* НОВОЕ КРАСИВОЕ МЕНЮ РЕЖИМОВ */
   .dropdown { position: relative; display: inline-block; }
   .dropdown-content {
     display: none; position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%);
-    background: #141635; min-width: 220px; border: 1px solid rgba(255,255,255,0.2);
+    background: #141635; min-width: 240px; border: 1px solid rgba(255,255,255,0.2);
     border-radius: 14px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); z-index: 10; overflow: hidden;
   }
-  .dropdown-content div { color: rgba(255,255,255,0.85); padding: 12px 18px; text-align: left; font-size: 13px; cursor: pointer; transition: all 0.15s; font-weight: 600; }
+  .dropdown-content div { color: rgba(255,255,255,0.85); padding: 12px 18px; text-align: left; font-size: 13px; cursor: pointer; transition: all 0.15s; font-weight: 600; display: flex; align-items: center; gap: 8px; }
   .dropdown-content div:hover { background: rgba(126,232,250,0.2); color: #7ee8fa; padding-left: 22px; }
   .dropdown.open .dropdown-content { display: block; }
 
-  /* Карточка результатов конца игры */
+  /* Карточка результатов */
   #resultCard {
     display:none; margin-top:10px; padding:36px; border-radius:24px; text-align:center;
-    background: linear-gradient(145deg, rgba(20, 22, 53, 0.98), rgba(10, 11, 30, 0.99));
-    border:1px solid rgba(255,255,255,0.15);
-    box-shadow: 0 35px 80px rgba(0,0,0,0.7);
-    animation: fadeInApp 0.4s ease-out;
+    background: linear-gradient(145deg, rgba(20, 22, 53, 0.98), rgba(10, 11, 30, 0.99)); border:1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 35px 80px rgba(0,0,0,0.7); animation: fadeInApp 0.4s ease-out;
   }
   #resultCard h2 { color:#fff; font-size:24px; margin-bottom:22px; font-weight:700; }
   #resultCard .row { display:flex; justify-content:center; gap:60px; margin-bottom:26px; }
@@ -151,13 +147,11 @@
   }
   #resultCard button:hover, .backBtn:hover { transform: translateY(-2px) scale(1.03); }
 
-  /* ОТДЕЛЬНАЯ СТРАНИЦА ДЛЯ РЕЙТИНГОВ */
+  /* СТРАНИЦА РЕЙТИНГА */
   #leaderboardPage {
-    position: absolute; inset: -10px;
-    background: #0d0e21;
-    z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center;
-    border-radius: 24px; color: #fff; padding: 30px;
-    animation: fadeInApp 0.4s ease-out;
+    position: absolute; inset: -10px; background: #0d0e21; z-index: 200;
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    border-radius: 24px; color: #fff; padding: 30px; animation: fadeInApp 0.4s ease-out;
   }
   .leaderContainer { width: 100%; max-width: 500px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
   .leaderContainer h2 { color: #ffca28; font-size: 26px; margin-bottom: 20px; font-weight: 800; text-align: center; text-shadow: 0 0 15px rgba(255,202,40,0.4); }
@@ -178,6 +172,13 @@
 <body>
 
 <div id="app">
+  <div id="registerScreen">
+    <h2>Создай профиль</h2>
+    <p>Введите свой никнейм для участия в таблице рекордов:</p>
+    <input type="text" id="usernameInput" placeholder="Твой никнейм..." maxlength="14" autocomplete="off">
+    <button id="saveUserBtn">Зарегистрироваться</button>
+  </div>
+
   <div id="welcomeScreen">
     <h1>Typing Speed Test</h1>
     <p>Проверь свою скорость печати, побеждай рекорды реальных игроков и займи заслуженное 1-ое место в мировом Топ-6 рейтинге!</p>
@@ -187,8 +188,7 @@
   <div id="leaderboardPage">
     <div class="leaderContainer">
       <h2>🏆 Мировой Топ-6 Рейтинг</h2>
-      <div class="leaderList" id="leaderboardList">
-        </div>
+      <div class="leaderList" id="leaderboardList"></div>
       <div class="recordBadge">🔥 Твой личный рекорд: <span id="pageBestWpmVal">0</span> WPM</div>
     </div>
     <button class="backBtn" id="ratingCloseBtn">← Вернуться к игре</button>
@@ -221,18 +221,19 @@
       <div class="diffBtn" data-t="60">60 сек</div>
       <div style="width:1px;background:rgba(255,255,255,0.12);height:18px;margin:0 4px;"></div>
       
-      <div class="dropdown" id="textDropdown">
-        <div class="selectBtn" id="currentTextLbl">🟢 Сложность: Легкий</div>
+      <div class="dropdown" id="modeDropdown">
+        <div class="selectBtn" id="currentModeLbl">🎲 Режим: Слова</div>
         <div class="dropdown-content">
-          <div data-mode="easy">🟢 Легкий уровень</div>
-          <div data-mode="hard">🟡 Сложный уровень</div>
-          <div data-mode="expert">🔴 Эксперт</div>
+          <div data-mode="words">🎲 Случайные слова</div>
+          <div data-mode="tech">💻 Технологии и будущее</div>
+          <div data-mode="nature">🌲 Философия природы</div>
+          <div data-mode="space">🚀 Космос и Вселенная</div>
         </div>
       </div>
 
       <div style="width:1px;background:rgba(255,255,255,0.12);height:18px;margin:0 4px;"></div>
-      <div class="diffBtn active" data-lang="ru">Русский</div>
-      <div class="diffBtn" data-lang="en">English</div>
+      <div class="diffBtn" data-lang="ru">Русский</div>
+      <div class="diffBtn active" data-lang="en">English</div>
       
       <div style="width:1px;background:rgba(255,255,255,0.12);height:18px;margin:0 4px;"></div>
       <button id="ratingOpenBtn">🏆 Рейтинг</button>
@@ -253,14 +254,23 @@
 </div>
 
 <script>
-const EASY_RU = "время жизнь рука дело мир слово друг утро море небо солнце дождь снег ветер лед дом река гора поле лед книга стул стол окно дверь свет тень звук шум хлеб вода чай".split(' ');
-const EASY_EN = "time life hand work day eye word code play game city book tree food water fire blue pink fast slow long home room door step back view open road walk run jump".split(' ');
-const HARD_RU = "пространство человечество ответственность действительность справедливость воображение производство классификация терминология характеристика государственность".split(' ');
-const HARD_EN = "transportation responsibility transformation configuration classification architecture interactive standardisation characterisation multi-disciplinary".split(' ');
+// Наборы слов под новые режимы со скриншота
+const WORDS_RU = "время жизнь рука дело мир слово друг утро море небо солнце дождь снег ветер лед дом река гора поле книга стул стол окно дверь свет тень звук шум хлеб вода чай".split(' ');
+const WORDS_EN = "process hand discovery artist thought practice noise experience change morning fox group way smell chair relation trust case quick stop book task machine speed shape musician invention theory project squad".split(' ');
 
-let currentLang = 'ru';
-let difficultyMode = 'easy'; 
+const TECH_RU = "технологии будущее интернет нейросеть робот алгоритм космос квант код программирование сервер кибербезопасность автоматизация разработка девайс процессор база гаджет".split(' ');
+const TECH_EN = "technology future internet AI robot algorithm quantum code software server cybersecurity automation development device processor database gadget hardware intelligence".split(' ');
+
+const NATURE_RU = "философия природа жизнь гармония вселенная сознание стихия эволюция биосфера планета экология дерево энергия баланс разум истина земля существование концепция".split(' ');
+const NATURE_EN = "philosophy nature life harmony universe consciousness element evolution biosphere planet ecology tree energy balance mind truth earth existence concept organic".split(' ');
+
+const SPACE_RU = "космос вселенная галактика звезда планета комета астероид ракета орбита телескоп вакуум гравитация спутник туманность метеорит марс солнце черная дыра бесконечность".split(' ');
+const SPACE_EN = "space universe galaxy star planet comet asteroid rocket orbit telescope vacuum gravity satellite nebula meteorite mars sun black hole infinity astronomy".split(' ');
+
+let currentLang = 'en'; // Судя по скринам, стоял английский
+let selectedMode = 'words'; 
 let isWelcomeRemoved = false;
+let currentUsername = localStorage.getItem('typing_username') || '';
 
 const DEFAULT_LEADERS = [
   { name: "NeoCyber", wpm: 88, isUser: false },
@@ -275,33 +285,15 @@ let leaders = JSON.parse(localStorage.getItem('typing_leaders')) || DEFAULT_LEAD
 let personalBest = parseInt(localStorage.getItem('typing_best_wpm')) || 0;
 
 function genWords(n){
+  let pool = [];
+  if (selectedMode === 'words') pool = currentLang === 'ru' ? WORDS_RU : WORDS_EN;
+  else if (selectedMode === 'tech') pool = currentLang === 'ru' ? TECH_RU : TECH_EN;
+  else if (selectedMode === 'nature') pool = currentLang === 'ru' ? NATURE_RU : NATURE_EN;
+  else if (selectedMode === 'space') pool = currentLang === 'ru' ? SPACE_RU : SPACE_EN;
+
   let arr = [];
-  if (difficultyMode === 'easy') {
-    const pool = currentLang === 'ru' ? EASY_RU : EASY_EN;
-    for(let i=0; i<n; i++) arr.push(pool[Math.floor(Math.random()*pool.length)]);
-    return arr.join(' ');
-  } 
-  else if (difficultyMode === 'hard') {
-    const pool = currentLang === 'ru' ? HARD_RU : HARD_EN;
-    for(let i=0; i<n; i++) {
-      let word = pool[Math.floor(Math.random()*pool.length)];
-      if(Math.random() < 0.2) word += Math.random() > 0.5 ? ',' : '.';
-      arr.push(word);
-    }
-    return arr.join(' ');
-  } 
-  else if (difficultyMode === 'expert') {
-    const pool = currentLang === 'ru' ? EASY_RU.concat(HARD_RU) : EASY_EN.concat(HARD_EN);
-    const symbols = currentLang === 'ru' ? ['!', '?', ';', ':', '-'] : ['!', '?', '@', '#', '-'];
-    for(let i=0; i<n; i++) {
-      let word = pool[Math.floor(Math.random()*pool.length)];
-      if (Math.random() < 0.3) word = word.charAt(0).toUpperCase() + word.slice(1);
-      if (Math.random() < 0.15) word += Math.floor(Math.random() * 100);
-      if (Math.random() < 0.2) word += symbols[Math.floor(Math.random() * symbols.length)];
-      arr.push(word);
-    }
-    return arr.join(' ');
-  }
+  for(let i=0; i<n; i++) arr.push(pool[Math.floor(Math.random()*pool.length)]);
+  return arr.join(' ');
 }
 
 let targetText = '';
@@ -318,18 +310,39 @@ const textInner = document.getElementById('textInner');
 const caret = document.getElementById('caret');
 const hiddenInput = document.getElementById('hiddenInput');
 const ringFg = document.getElementById('ringFg');
-const dropdown = document.getElementById('textDropdown');
-const currentTextLbl = document.getElementById('currentTextLbl');
+const modeDropdown = document.getElementById('modeDropdown');
+const currentModeLbl = document.getElementById('currentModeLbl');
 const welcomeScreen = document.getElementById('welcomeScreen');
 const leaderboardPage = document.getElementById('leaderboardPage');
+const registerScreen = document.getElementById('registerScreen');
 
 const CIRCUM = 169.6;
 const LINE_HEIGHT = 54;
 let translateY = 0;
 
+function checkRegistration() {
+  if (!currentUsername) {
+    registerScreen.style.display = 'flex';
+  } else {
+    registerScreen.style.display = 'none';
+  }
+}
+
+document.getElementById('saveUserBtn').addEventListener('click', () => {
+  const inputVal = document.getElementById('usernameInput').value.trim();
+  if (inputVal.length >= 2) {
+    currentUsername = inputVal;
+    localStorage.setItem('typing_username', currentUsername);
+    registerScreen.style.display = 'none';
+    if(isWelcomeRemoved) hiddenInput.focus();
+  } else {
+    alert('Пожалуйста, введите никнейм (минимум 2 символа).');
+  }
+});
+
 function renderText(){
   let html = '';
-  for(let i=0;i<targetText.length;i++){
+  for(let i=0; i<targetText.length; i++){
     const ch = targetText[i];
     if(i < typed.length){
       html += `<span class="${typed[i]===ch?'correct':'wrong'}">${ch===' '?'&nbsp;':ch}</span>`;
@@ -385,7 +398,7 @@ function startNew(){
   renderText();
   hiddenInput.value = '';
   
-  if(isWelcomeRemoved && leaderboardPage.style.display !== 'flex') {
+  if(isWelcomeRemoved && leaderboardPage.style.display !== 'flex' && currentUsername) {
     setTimeout(() => hiddenInput.focus(), 20);
   }
 }
@@ -422,7 +435,7 @@ function renderLeaderboardView() {
     row.className = `leaderRow ${player.isUser ? 'userRow' : ''}`;
     row.innerHTML = `
       <span class="leaderPlace">#${index + 1}</span>
-      <span class="leaderName">${player.name}</span>
+      <span class="leaderName">${player.isUser ? currentUsername + " (Вы)" : player.name}</span>
       <span class="leaderScore">${player.wpm} WPM</span>
     `;
     listContainer.appendChild(row);
@@ -432,10 +445,8 @@ function renderLeaderboardView() {
 }
 
 function updateLeaderboardData(userWpm) {
-  // Убираем прошлый результат юзера
   leaders = leaders.filter(l => !l.isUser);
-  // Вставляем новый результат
-  leaders.push({ name: "Вы (Игрок)", wpm: userWpm, isUser: true });
+  leaders.push({ name: currentUsername, wpm: userWpm, isUser: true });
   leaders.sort((a, b) => b.wpm - a.wpm);
   leaders = leaders.slice(0, 6);
   localStorage.setItem('typing_leaders', JSON.stringify(leaders));
@@ -464,7 +475,7 @@ function endGame(){
 }
 
 hiddenInput.addEventListener('input', (e)=>{
-  if(finished || !isWelcomeRemoved || leaderboardPage.style.display === 'flex') return;
+  if(finished || !isWelcomeRemoved || leaderboardPage.style.display === 'flex' || !currentUsername) return;
   if(!startTime) startTimer();
 
   const val = hiddenInput.value;
@@ -487,13 +498,13 @@ document.getElementById('startAppBtn').addEventListener('click', (e) => {
   setTimeout(() => {
     welcomeScreen.style.display = 'none';
     isWelcomeRemoved = true;
-    hiddenInput.focus();
+    if(currentUsername) hiddenInput.focus();
   }, 400);
 });
 
-// Логика переключения страниц
 document.getElementById('ratingOpenBtn').addEventListener('click', (e) => {
   e.stopPropagation();
+  if(!currentUsername) return;
   clearInterval(timerInterval);
   renderLeaderboardView();
   leaderboardPage.style.display = 'flex';
@@ -529,28 +540,32 @@ document.querySelectorAll('.diffBtn[data-lang]').forEach(btn=>{
   });
 });
 
-currentTextLbl.addEventListener('click', (e) => {
+// Открытие нового выпадающего списка
+currentModeLbl.addEventListener('click', (e) => {
   e.stopPropagation();
-  if(isWelcomeRemoved && leaderboardPage.style.display !== 'flex') dropdown.classList.toggle('open');
+  if(isWelcomeRemoved && leaderboardPage.style.display !== 'flex') modeDropdown.classList.toggle('open');
 });
 
+// Обработка кликов по новым режимам со скриншота
 document.querySelectorAll('.dropdown-content div').forEach(item => {
   item.addEventListener('click', (e) => {
     e.stopPropagation();
-    difficultyMode = item.dataset.mode;
-    if(difficultyMode === 'easy') currentTextLbl.textContent = "🟢 Сложность: Легкий";
-    if(difficultyMode === 'hard') currentTextLbl.textContent = "🟡 Сложность: Сложный";
-    if(difficultyMode === 'expert') currentTextLbl.textContent = "🔴 Сложность: Эксперт";
-    dropdown.classList.remove('open');
+    selectedMode = item.dataset.mode;
+    if(selectedMode === 'words') currentModeLbl.textContent = "🎲 Режим: Слова";
+    if(selectedMode === 'tech') currentModeLbl.textContent = "💻 Режим: Технологии";
+    if(selectedMode === 'nature') currentModeLbl.textContent = "🌲 Режим: Философия";
+    if(selectedMode === 'space') currentModeLbl.textContent = "🚀 Режим: Космос";
+    modeDropdown.classList.remove('open');
     startNew();
   });
 });
 
 document.addEventListener('click', () => {
-  dropdown.classList.remove('open');
-  if(!finished && isWelcomeRemoved && leaderboardPage.style.display !== 'flex') hiddenInput.focus();
+  modeDropdown.classList.remove('open');
+  if(!finished && isWelcomeRemoved && leaderboardPage.style.display !== 'flex' && currentUsername) hiddenInput.focus();
 });
 
+checkRegistration();
 startNew();
 </script>
 </body>
