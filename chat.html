@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Чат участников</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    width: 100vw; height: 100vh; 
+    background: radial-gradient(circle at 50% 0%, #1e1e38 0%, #0d0e21 60%, #050512 100%);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex; justify-content: center; align-items: center;
+    overflow: hidden;
+  }
+
+  #chatContainer {
+    width: 95vw; height: 90vh; max-width: 1100px; 
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+  }
+
+  #chatHeader { 
+    padding: 20px 30px; 
+    background: rgba(255, 255, 255, 0.03); 
+    color: #7ee8fa;
+    display: flex; flex-direction: column; gap: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    text-shadow: 0 0 10px rgba(126,232,250,0.3);
+  }
+  #chatHeader h2 { font-size: 18px; font-weight: 700; }
+  #chatHeader .status { font-size: 13px; color: #a5a9e8; transition: color 0.3s; }
+  
+  #chatMessages { 
+    flex: 1; padding: 30px; 
+    overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
+    background: transparent;
+  }
+  
+  #chatMessages::-webkit-scrollbar { width: 6px; }
+  #chatMessages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+  .chatMsg { 
+    padding: 12px 18px; border-radius: 16px; 
+    color: #fff; font-size: 15px; line-height: 1.4;
+    max-width: 70%; width: fit-content;
+    display: flex; flex-direction: column;
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    word-break: break-word;
+  }
+  
+  .chatMsg.otherMsg {
+    background: rgba(255, 255, 255, 0.04);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+  
+  .chatMsg.myMsg {
+    background: rgba(126, 232, 250, 0.12);
+    border-color: rgba(126, 232, 250, 0.2);
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+
+  .chatMsg .uName { 
+    color: #eec0c6; font-weight: 600; font-size: 13px; 
+    margin-bottom: 4px; letter-spacing: 0.5px;
+  }
+  .chatMsg.myMsg .uName { color: #7ee8fa; }
+
+  #chatForm { 
+    padding: 20px 30px; display: flex; gap: 15px; 
+    background: rgba(0, 0, 0, 0.2); align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  
+  #chatInput { 
+    flex: 1; padding: 16px 20px; 
+    background: rgba(255, 255, 255, 0.05); 
+    border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; 
+    color: #fff; outline: none; font-size: 15px;
+    transition: 0.2s;
+  }
+  #chatInput:focus {
+    border-color: #7ee8fa;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  
+  #chatSendBtn { 
+    background: linear-gradient(135deg, #7ee8fa, #eec0c6); 
+    border: none; color: #0b0c1f;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    padding: 16px 28px; border-radius: 12px; transition: 0.2s;
+  }
+  #chatSendBtn:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(126,232,250,0.3); }
+</style>
+</head>
+<body>
+
+<div id="chatContainer">
+  <div id="chatHeader">
+    <h2>💬 Общий чат кликеров</h2>
+    <div class="status" id="statusLine">Подключение к серверу...</div>
+  </div>
+  
+  <div id="chatMessages"></div>
+  
+  <form id="chatForm">
+    <input type="text" id="chatInput" placeholder="Напишите сообщение..." autocomplete="off" maxlength="200">
+    <button type="submit" id="chatSendBtn">ОТПРАВИТЬ</button>
+  </form>
+</div>
+
+<script>
+let currentUsername = localStorage.getItem('typing_user') || 'Аноним';
+let ws;
+
+function initChat() {
+  ws = new WebSocket('ws://localhost:3000');
+  
+  ws.onopen = () => {
+    document.getElementById('statusLine').textContent = '● Онлайн (связь установлена)';
+    document.getElementById('statusLine').style.color = '#8bf7a0';
+  };
+
+  ws.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+    if(data.type === 'history') {
+      document.getElementById('chatMessages').innerHTML = '';
+      data.messages.forEach(m => addMsg(m));
+    } else if(data.type === 'new_message') {
+      addMsg(data.message);
+    }
+  };
+  
+  ws.onclose = () => { 
+    document.getElementById('statusLine').textContent = 'Соединение разорвано. Переподключение...';
+    document.getElementById('statusLine').style.color = '#ff6b81';
+    setTimeout(initChat, 2000); 
+  };
+}
+
+function addMsg(m) {
+  const box = document.getElementById('chatMessages');
+  const isMe = m.username === currentUsername;
+  
+  box.innerHTML += `
+    <div class="chatMsg ${isMe ? 'myMsg' : 'otherMsg'}">
+      <span class="uName">${m.username}</span>
+      <div>${m.text}</div>
+    </div>
+  `;
+  box.scrollTop = box.scrollHeight;
+}
+
+document.getElementById('chatForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const input = document.getElementById('chatInput');
+  
+  if(!input.value.trim()) return;
+  if(!ws || ws.readyState !== WebSocket.OPEN) return;
+  
+  ws.send(JSON.stringify({ 
+    type: 'message', 
+    username: currentUsername, 
+    text: input.value.trim() 
+  }));
+  
+  input.value = '';
+});
+
+initChat();
+</script>
+</body>
+</html>

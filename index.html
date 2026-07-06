@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Typing Speed Test — Abuabkr</title>
+<title>Typing Speed Test — Abuabkr Элитный режим</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
@@ -13,201 +13,116 @@
     overflow:hidden;
   }
 
-  #mainContainer { display: flex; width: 95vw; max-width: 1300px; height: 85vh; gap: 25px; }
-  
-  /* Игровая зона */
-  #app { flex: 1; display: flex; flex-direction: column; gap: 20px; position: relative; justify-content: center; }
+  /* Сделали ширину приложения больше, чтобы строки были длиннее */
+  #app { width: 95vw; max-width: 1100px; display: flex; flex-direction: column; gap: 35px; position: relative; }
 
   #profilePanel {
-    position: absolute; top: 0; right: 0; display: flex; align-items: center; gap: 12px;
+    position: absolute; top: -50px; right: 0; display: flex; align-items: center; gap: 12px;
     background: rgba(255, 255, 255, 0.03); padding: 6px 14px; border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.08); color: #fff; font-size: 14px; z-index: 10;
+    border: 1px solid rgba(255, 255, 255, 0.08); color: #fff; font-size: 14px;
   }
   #logoutBtn { background: none; border: none; color: #ff6b81; font-weight: 700; cursor: pointer; margin-left: 10px; }
 
-  /* Экран профиля */
   #registerScreen {
-    position: absolute; inset: 0; background: #0d0e21; z-index: 300;
+    position: absolute; inset: -60px -20px; background: #0d0e21; z-index: 300;
     display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff;
   }
-  #registerScreen h2 { font-size: 36px; margin-bottom: 15px; font-weight: 800; background: linear-gradient(135deg, #7ee8fa, #eec0c6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  #registerScreen p { color: rgba(255,255,255,0.6); margin-bottom: 20px; font-size: 14px; }
-  #usernameInput { padding: 16px 20px; font-size: 18px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: #fff; text-align: center; margin-bottom: 20px; outline: none; width: 300px; }
-  #saveUserBtn { padding: 16px 40px; font-size: 16px; font-weight: 700; color: #0b0c1f; background: linear-gradient(135deg, #7ee8fa, #eec0c6); border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 0 15px rgba(126,232,250,0.4); }
+  #usernameInput { padding: 16px 20px; font-size: 18px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: #fff; text-align: center; margin-bottom: 20px; outline: none; }
+  #saveUserBtn { padding: 14px 40px; font-size: 16px; font-weight: 700; color: #0b0c1f; background: linear-gradient(135deg, #7ee8fa, #eec0c6); border: none; border-radius: 14px; cursor: pointer; }
 
-  /* Статистика */
-  #stats { display:flex; justify-content:space-between; align-items:center; color:#c9ccf5; width: 100%; padding: 0 40px; }
-  .metric { text-align:center; }
-  .val { font-size:46px; font-weight:800; color:#7ee8fa; text-shadow: 0 0 10px rgba(126,232,250,0.3); }
-  .lbl { font-size:11px; letter-spacing:2px; color: #a5a9e8; text-transform:uppercase; margin-top: 4px; }
+  #stats { display:flex; justify-content:space-between; align-items:center; color:#c9ccf5; padding: 0 40px; }
+  .val { font-size:46px; font-weight:800; color:#7ee8fa; }
+  .lbl { font-size:11px; letter-spacing:2px; color: #a5a9e8; text-transform:uppercase; }
 
-  /* Текст и каретка */
-  #textViewport { position:relative; font-size:32px; color:rgba(255,255,255,0.25); font-family: monospace; height:120px; overflow:hidden; width: 100%; padding: 10px; }
-  #textInner { position:relative; display:flex; flex-wrap:wrap; line-height:50px; pointer-events: none; transition: transform 0.2s; font-weight: 600; }
-  #textInner span { white-space:pre; }
-  .correct { color:#8bf7a0; text-shadow: 0 0 10px rgba(139,247,160,0.4); }
+  /* Текст теперь без бэкграунда и рамок — эффект «в воздухе» */
+  #textViewport { 
+    position:relative; font-size:32px; font-family: monospace; 
+    height:130px; overflow:hidden; width: 100%; padding: 0px;
+    background: none; border: none;
+  }
+  #textInner { 
+    position:relative; display:flex; flex-wrap:wrap; line-height:60px; 
+    pointer-events: none; transition: transform 0.2s ease; font-weight: 600; 
+    color: rgba(255,255,255,0.2);
+  }
+  #textInner span { white-space:pre; display: inline-block; }
+  .correct { color:#8bf7a0; text-shadow: 0 0 10px rgba(139,247,160,0.3); }
   .wrong { color:#ff6b81; background: rgba(255,107,129,0.2); border-radius:4px; }
   
-  #caret { position:absolute; width:3px; height:36px; background:#7ee8fa; box-shadow:0 0 8px #7ee8fa; transition: all 0.05s ease; }
-
-  #hiddenInput { position:absolute; top:-9999px; left:-9999px; opacity:0; }
-  #overlay { text-align:center; color:rgba(255,255,255,0.4); font-size:14px; margin-top: 10px; }
-
-  /* Панель управления */
-  #controlBar { display: flex; justify-content: center; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 15px; }
-  .btn { padding:10px 18px; border-radius:12px; font-size:13px; cursor:pointer; background: rgba(255,255,255,0.04); color:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.1); font-weight: 600; transition: 0.2s; }
-  .btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-  .btn.active { background: rgba(126,232,250,0.15); border-color: #7ee8fa; color: #7ee8fa; }
-  #ratingOpenBtn { color: #ffca28; background: rgba(255, 202, 40, 0.05); border-color: rgba(255, 202, 40, 0.2); }
-  #ratingOpenBtn:hover { background: rgba(255, 202, 40, 0.15); }
-
-  /* Выпадающее меню режимов */
-  .dropdown { position: relative; display: inline-block; }
-  .dropdown-content {
-    display: none; position: absolute; bottom: 45px; left: 0; background: #141635;
-    min-width: 200px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 400; overflow: hidden;
+  /* Идеально точная каретка прямо возле букв */
+  #caret { 
+    position:absolute; width:3px; height:36px; background:#7ee8fa; 
+    box-shadow:0 0 8px #7ee8fa; transition: all 0.05s ease; 
+    transform: translateY(12px); /* Точечное смещение к линии шрифта */
   }
-  .dropdown-content div { padding: 12px 16px; color: #fff; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-  .dropdown-content div:hover { background: rgba(255,255,255,0.05); color: #7ee8fa; }
-  .dropdown:hover .dropdown-content { display: block; }
+  #hiddenInput { position:absolute; top:-9999px; left:-9999px; opacity:0; }
+  #overlay { text-align:center; color:rgba(255,255,255,0.4); font-size:14px; margin-top: 5px; }
 
-  /* Экран рейтинга */
-  #leaderboardPage { position: absolute; inset: 0; background: #0d0e21; z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
+  #controlBar { display: flex; justify-content: center; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .btn { padding:10px 18px; border-radius:12px; font-size:13px; cursor:pointer; background: rgba(255,255,255,0.04); color:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.1); font-weight: 600; }
+  .btn.active { background: rgba(126,232,250,0.15); border-color: #7ee8fa; color: #7ee8fa; }
+  
+  #chatOpenBtn { background: linear-gradient(135deg, #7ee8fa, #eec0c6); color: #0b0c1f; border: none; font-weight: 700; }
+
+  #leaderboardPage { position: absolute; inset: -40px -10px; background: #0d0e21; z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
   .leaderList { width: 100%; max-width: 450px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; }
   .leaderRow { display: flex; justify-content: space-between; padding: 12px 16px; margin-bottom: 6px; background: rgba(255,255,255,0.03); border-radius: 10px; }
-  .userRow { border: 1px solid #7ee8fa; background: rgba(126,232,250,0.1); color: #7ee8fa; font-weight: bold; }
-
-  /* Живой Чат */
-  #chatWrapper { width: 330px; background: rgba(20, 22, 53, 0.5); backdrop-filter: blur(10px); border-radius: 24px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; overflow: hidden; }
-  #chatHeader { padding: 18px; background: rgba(255,255,255,0.01); font-weight: 700; color: #7ee8fa; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 15px; }
-  #chatMessages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-  .chatMsg { background: rgba(255,255,255,0.03); padding: 10px 14px; border-radius: 12px; color: #fff; font-size: 14px; line-height: 1.4; border: 1px solid rgba(255,255,255,0.02); }
-  .chatMsg .uName { color: #eec0c6; font-weight: bold; font-size: 12px; margin-right: 6px; display: block; margin-bottom: 2px; }
-  #chatForm { padding: 12px; display: flex; gap: 8px; background: rgba(0,0,0,0.15); border-top: 1px solid rgba(255,255,255,0.05); }
-  #chatInput { flex: 1; padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; outline: none; font-size: 14px; }
-  #chatInput:focus { border-color: #7ee8fa; }
-  #chatSendBtn { padding: 0 16px; background: linear-gradient(135deg, #7ee8fa, #eec0c6); border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: #0b0c1f; }
+  .userRow { border: 1px solid #7ee8fa; background: rgba(126,232,250,0.1); color: #7ee8fa; }
 </style>
 </head>
 <body>
 
-<div id="mainContainer">
-  <div id="app">
-    <div id="profilePanel" style="display: none;">
-      👤 <span id="profileUser" style="color: #7ee8fa; font-weight: bold;"></span>
-      <button id="logoutBtn">Выйти</button>
-    </div>
-
-    <div id="registerScreen">
-      <h2>Создай профиль</h2>
-      <p>Введите свой никнейм для участия в таблице рекордов:</p>
-      <input type="text" id="usernameInput" placeholder="Никнейм..." maxlength="14" autocomplete="off">
-      <button id="saveUserBtn">Зарегистрироваться</button>
-    </div>
-
-    <div id="leaderboardPage">
-      <h2 style="margin-bottom: 20px; color: #ffca28; font-size: 28px;">🏆 Живой Рейтинг Участников</h2>
-      <div class="leaderList" id="leaderboardList"></div>
-      <button class="btn" id="ratingCloseBtn" style="margin-top: 20px; padding: 12px 30px;">← Назад к игре</button>
-    </div>
-
-    <div id="stats">
-      <div class="metric"><div class="val" id="wpmVal">0</div><div class="lbl">WPM</div></div>
-      <div class="metric"><div class="val" id="accVal">100%</div><div class="lbl">Точность</div></div>
-      <div class="metric"><div class="val" id="errVal">0</div><div class="lbl">Ошибки</div></div>
-      <div class="metric"><div class="val" id="timeVal">15</div><div class="lbl">Секунд</div></div>
-    </div>
-
-    <div id="textViewport"><div id="textInner"></div><div id="caret"></div></div>
-    <input id="hiddenInput" autocomplete="off" autocapitalize="off" spellcheck="false">
-    <div id="overlay">Кликни в любой точке экрана и начни печатать для старта</div>
-
-    <div id="controlBar">
-      <button class="btn time-btn active" data-t="15">15 сек</button>
-      <button class="btn time-btn" data-t="30">30 сек</button>
-      <button class="btn time-btn" data-t="60">60 sec</button>
-      
-      <div class="dropdown">
-        <button class="btn" id="modeBtn">🎲 Режим: Слова</button>
-        <div class="dropdown-content">
-          <div onclick="changeMode('words', '🎲 Режим: Слова')">🎲 Случайные слова</div>
-          <div onclick="changeMode('tech', '💻 Технологии')">💻 Технологии и будущее</div>
-          <div onclick="changeMode('nature', '🌲 Философия природы')">🌲 Философия природы</div>
-          <div onclick="changeMode('space', '🚀 Космос')">🚀 Космос и Вселенная</div>
-        </div>
-      </div>
-
-      <button class="btn lang-btn active" data-l="ru">Русский</button>
-      <button class="btn lang-btn" data-l="en">English</button>
-      
-      <button class="btn" id="ratingOpenBtn">🏆 Рейтинг</button>
-      <button class="btn" id="restartBtn">⟳ Сброс</button>
-    </div>
+<div id="app">
+  <div id="profilePanel" style="display: none;">
+    👤 <span id="profileUser" style="color: #7ee8fa; font-weight: bold;"></span>
+    <button id="logoutBtn">Выйти</button>
   </div>
 
-  <div id="chatWrapper">
-    <div id="chatHeader">💬 Онлайн-чат участников</div>
-    <div id="chatMessages"></div>
-    <form id="chatForm">
-      <input type="text" id="chatInput" placeholder="Сообщение в чат..." autocomplete="off" maxlength="100">
-      <button type="submit" id="chatSendBtn">></button>
-    </form>
+  <div id="registerScreen">
+    <h2>Создай профиль</h2>
+    <input type="text" id="usernameInput" placeholder="Никнейм..." maxlength="14" autocomplete="off">
+    <button id="saveUserBtn">Зарегистрироваться</button>
   </div>
+
+  <div id="leaderboardPage">
+    <h2 style="margin-bottom: 20px; color: #ffca28; font-size: 28px;">🏆 Живой Рейтинг</h2>
+    <div class="leaderList" id="leaderboardList"></div>
+    <button class="btn" id="ratingCloseBtn" style="margin-top: 20px;">← Назад</button>
+  </div>
+
+  <div id="stats">
+    <div class="metric"><div class="val" id="wpmVal">0</div><div class="lbl">WPM</div></div>
+    <div class="metric"><div class="val" id="accVal">100%</div><div class="lbl">Точность</div></div>
+    <div class="metric"><div class="val" id="errVal">0</div><div class="lbl">Ошибки</div></div>
+    <div class="metric"><div class="val" id="timeVal">15</div><div class="lbl">Секунд</div></div>
+  </div>
+
+  <div id="textViewport">
+    <div id="textInner"></div>
+    <div id="caret"></div>
+  </div>
+  <input id="hiddenInput" autocomplete="off" autocapitalize="off" spellcheck="false">
+  <div id="overlay">Кликни и начни писать · Текст парит в воздухе!</div>
+
+  <div id="controlBar">
+    <button class="btn time-btn active" data-t="15">15 сек</button>
+    <button class="btn time-btn" data-t="30">30 сек</button>
+    <button class="btn time-btn" data-t="60">60 сек</button>
+    <button class="btn lang-btn active" data-l="ru">Русский</button>
+    <button class="btn lang-btn" data-l="en">English</button>
+    <button class="btn" id="ratingOpenBtn" style="color:#ffca28;">🏆 Рейтинг</button>
+    <button class="btn" id="restartBtn">⟳ Сброс</button>
+<button class="btn" id="chatOpenBtn" onclick="window.open('chat.html', '_blank')">💬 Чат в отдельной вкладке</button>  </div>
 </div>
 
 <script>
-// СЛОВАРИ ДЛЯ РАЗНЫХ РЕЖИМОВ И ЯЗЫКОВ
 const DICTIONARIES = {
-  ru: {
-    words: "время жизнь рука дело мир слово друг утро море небо солнце дождь снег ветер лед дом река гора поле книга стул стол окно дверь свет тень звук".split(' '),
-    tech: "процессор интернет сервер программа код данные экран квант робот алгоритм база сеть интерфейс массив функция кибер автоматика память система поток".split(' '),
-    nature: "дерево лист земля трава цветок корень капля скала туман гроза рассвет закат лес океан тропа стихия флора фауна фаза климат зерно оазис".split(' '),
-    space: "космос ракета звезда планета орбита комета вакуум галактика метеорит спутник телескоп гравитация пульсар туманность зонд квазар вселенная астронавт".split(' ')
-  },
-  en: {
-    words: "process hand discovery artist thought practice noise experience change morning fox group way smell chair relation trust case quick stop book task machine speed shape".split(' '),
-    tech: "processor internet server program code data screen quantum robot algorithm database network interface array function cyber memory system stream".split(' '),
-    nature: "tree leaf earth grass flower root drop rock fog storm sunrise sunset forest ocean trail flora fauna phase climate seed oasis".split(' '),
-    space: "space rocket star planet orbit comet vacuum galaxy meteorite satellite telescope gravity pulsar nebula probe quasar universe astronaut".split(' ')
-  }
+  ru: "время жизнь рука дело мир слово друг утро море небо солнце дождь снег ветер лед дом река гора поле книга стул стол окно дверь свет тень звук город дорога машина дерево птица трава человек душа песня голос огонь земля вода".split(' '),
+  en: "process hand discovery artist thought practice noise experience change morning fox group way smell chair relation trust case quick stop book task machine speed shape world time life line sound light house water fire earth".split(' ')
 };
 
 let currentLang = 'ru';
-let currentCategory = 'words';
 let currentUsername = localStorage.getItem('typing_user') || '';
-let ws;
-
-// Инициализация веб-сокета для чата
-function initChat() {
-  if (ws) return;
-  ws = new WebSocket('ws://localhost:3000');
-  ws.onmessage = (e) => {
-    const data = JSON.parse(e.data);
-    const box = document.getElementById('chatMessages');
-    if(data.type === 'history') {
-      box.innerHTML = '';
-      data.messages.forEach(m => addMsg(m));
-    } else if(data.type === 'new_message') {
-      addMsg(data.message);
-    }
-  };
-  ws.onclose = () => { ws = null; setTimeout(initChat, 2000); };
-}
-
-function addMsg(m) {
-  const box = document.getElementById('chatMessages');
-  box.innerHTML += `<div class="chatMsg"><span class="uName">${m.username}</span>${m.text}</div>`;
-  box.scrollTop = box.scrollHeight;
-}
-
-document.getElementById('chatForm').addEventListener('submit', (e) => {
-  e.preventDefault();
-  const input = document.getElementById('chatInput');
-  if(!input.value.trim() || !ws || ws.readyState !== WebSocket.OPEN) return;
-  ws.send(JSON.stringify({ type: 'message', username: currentUsername, text: input.value.trim() }));
-  input.value = '';
-});
 
 function checkAuth() {
   if(!currentUsername) {
@@ -216,7 +131,6 @@ function checkAuth() {
     document.getElementById('registerScreen').style.display = 'none';
     document.getElementById('profilePanel').style.display = 'flex';
     document.getElementById('profileUser').textContent = currentUsername;
-    initChat();
   }
 }
 
@@ -236,30 +150,26 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
   location.reload();
 });
 
-// Логика игры
-let targetText = '', typed = '', timeLimit = 15, timeLeft = 15, timer = null, active = false, errors = 0;
+let targetText = '', typed = '', timeLimit = 15, timeLeft = 15, timer = null, active = false;
 
 function generateText() {
   let res = [];
-  const dict = DICTIONARIES[currentLang][currentCategory];
-  for(let i=0; i<80; i++) res.push(dict[Math.floor(Math.random()*dict.length)]);
+  const dict = DICTIONARIES[currentLang];
+  for(let i=0; i<350; i++) res.push(dict[Math.floor(Math.random()*dict.length)]);
   targetText = res.join(' ');
   typed = '';
   document.getElementById('hiddenInput').value = '';
+  document.getElementById('textInner').style.transform = 'translateY(0px)';
   render();
 }
 
 function render() {
   let html = '';
-  errors = 0;
+  let errors = 0;
   for(let i=0; i<targetText.length; i++) {
     if(i < typed.length) {
-      if (typed[i] === targetText[i]) {
-        html += `<span class="correct">${targetText[i]}</span>`;
-      } else {
-        html += `<span class="wrong">${targetText[i]}</span>`;
-        errors++;
-      }
+      html += `<span class="${typed[i] === targetText[i] ? 'correct' : 'wrong'}">${targetText[i]}</span>`;
+      if(typed[i] !== targetText[i]) errors++;
     } else {
       html += `<span>${targetText[i]}</span>`;
     }
@@ -271,6 +181,12 @@ function render() {
   if(span) {
     document.getElementById('caret').style.left = span.offsetLeft + 'px';
     document.getElementById('caret').style.top = span.offsetTop + 'px';
+    
+    if(span.offsetTop > 60) {
+      document.getElementById('textInner').style.transform = `translateY(-${span.offsetTop - 0}px)`;
+    } else {
+      document.getElementById('textInner').style.transform = 'translateY(0px)';
+    }
   }
 }
 
@@ -309,7 +225,7 @@ async function saveScore() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: currentUsername, wpm: finalWpm })
     });
-  } catch(e) { console.log("Сервер недоступен"); }
+  } catch(e) {}
   
   alert(`Тест окончен! Твой результат: ${finalWpm} WPM`);
   resetGame();
@@ -327,13 +243,6 @@ function resetGame() {
   generateText();
 }
 
-function changeMode(category, label) {
-  currentCategory = category;
-  document.getElementById('modeBtn').textContent = label;
-  resetGame();
-}
-
-// Слушатели кнопок времени
 document.querySelectorAll('.time-btn').forEach(b => {
   b.addEventListener('click', (e) => {
     document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
@@ -343,7 +252,6 @@ document.querySelectorAll('.time-btn').forEach(b => {
   });
 });
 
-// Слушатели кнопок языка
 document.querySelectorAll('.lang-btn').forEach(b => {
   b.addEventListener('click', (e) => {
     document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
@@ -356,37 +264,25 @@ document.querySelectorAll('.lang-btn').forEach(b => {
 document.getElementById('ratingOpenBtn').addEventListener('click', async () => {
   document.getElementById('leaderboardPage').style.display = 'flex';
   const list = document.getElementById('leaderboardList');
-  list.innerHTML = '<div style="color:gray;">Загрузка...</div>';
-  
   try {
     const res = await fetch('http://localhost:3000/api/leaders');
     const data = await res.json();
     list.innerHTML = '';
-    
-    if(!data.leaders.length) {
-      list.innerHTML = '<div style="color:gray; text-align:center;">Рейтинг пуст. Установи первый рекорд!</div>';
-    } else {
-      data.leaders.forEach((p, idx) => {
-        list.innerHTML += `<div class="leaderRow ${p.name === currentUsername ? 'userRow' : ''}">
-          <span>#${idx+1} ${p.name}</span>
-          <strong>${p.wpm} WPM</strong>
-        </div>`;
-      });
-    }
-  } catch (e) {
-    list.innerHTML = '<div style="color:#ff6b81; text-align:center;">Не удалось подключиться к серверу рекордов.</div>';
-  }
+    data.leaders.forEach((p, idx) => {
+      list.innerHTML += `<div class="leaderRow ${p.name === currentUsername ? 'userRow' : ''}">
+        <span>#${idx+1} ${p.name}</span><strong>${p.wpm} WPM</strong>
+      </div>`;
+    });
+  } catch (e) { list.innerHTML = '<div style="color:red;">Сервер недоступен</div>'; }
 });
 
-document.getElementById('leaderboardPage').addEventListener('click', (e) => {
-  if(e.target.id === 'ratingCloseBtn' || e.target === document.getElementById('leaderboardPage')) {
-    document.getElementById('leaderboardPage').style.display = 'none';
-  }
+document.getElementById('ratingCloseBtn').addEventListener('click', () => {
+  document.getElementById('leaderboardPage').style.display = 'none';
 });
 
 document.getElementById('restartBtn').addEventListener('click', resetGame);
 document.body.addEventListener('click', (e) => {
-  if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && !e.target.closest('.dropdown-content')) {
+  if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
     if(currentUsername) document.getElementById('hiddenInput').focus();
   }
 });
@@ -395,4 +291,4 @@ checkAuth();
 generateText();
 </script>
 </body>
-</html>
+</html> 
