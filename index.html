@@ -1,100 +1,119 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>Typing Speed Test — Abuabkr Элитный режим</title>
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    width:100vw; height:100vh;
-    background: radial-gradient(circle at 50% 0%, #1e1e38 0%, #0d0e21 60%, #050512 100%);
-    font-family: 'Segoe UI', Arial, sans-serif;
-    display:flex; align-items:center; justify-content:center;
-    overflow:hidden;
-  }
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237ee8fa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3z'></path><path d='M6 21a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v12a3 3 0 0 0 3 3z'></path></svg>">
+  <title>Typing Speed Test — Abuabkr</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      width: 100vw; height: 100vh;
+      background: radial-gradient(circle at 50% 0%, #1e1e38 0%, #0d0e21 60%, #050512 100%);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      color: #fff; overflow: hidden;
+    }
 
-  /* Сделали ширину приложения больше, чтобы строки были длиннее */
-  #app { width: 95vw; max-width: 1100px; display: flex; flex-direction: column; gap: 35px; position: relative; }
+    #app { width: 95vw; max-width: 1100px; display: flex; flex-direction: column; gap: 35px; position: relative; }
 
-  #profilePanel {
-    position: absolute; top: -50px; right: 0; display: flex; align-items: center; gap: 12px;
-    background: rgba(255, 255, 255, 0.03); padding: 6px 14px; border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.08); color: #fff; font-size: 14px;
-  }
-  #logoutBtn { background: none; border: none; color: #ff6b81; font-weight: 700; cursor: pointer; margin-left: 10px; }
+    .user-panel {
+      position: absolute; top: -50px; right: 0;
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(255, 255, 255, 0.03); padding: 6px 14px; border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08); font-size: 14px;
+    }
+    .logout-btn { background: none; border: none; color: #ff6b81; font-weight: 700; cursor: pointer; margin-left: 10px; }
 
-  #registerScreen {
-    position: absolute; inset: -60px -20px; background: #0d0e21; z-index: 300;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff;
-  }
-  #usernameInput { padding: 16px 20px; font-size: 18px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: #fff; text-align: center; margin-bottom: 20px; outline: none; }
-  #saveUserBtn { padding: 14px 40px; font-size: 16px; font-weight: 700; color: #0b0c1f; background: linear-gradient(135deg, #7ee8fa, #eec0c6); border: none; border-radius: 14px; cursor: pointer; }
+    .stats-container { display: flex; justify-content: space-between; align-items: center; padding: 0 40px; }
+    .stat-box .num { font-size: 46px; font-weight: 800; color: #7ee8fa; text-shadow: 0 0 10px rgba(126,232,250,0.3); }
+    .stat-box .label { font-size: 11px; letter-spacing: 2px; color: #a5a9e8; text-transform: uppercase; margin-top: 4px; }
 
-  #stats { display:flex; justify-content:space-between; align-items:center; color:#c9ccf5; padding: 0 40px; }
-  .val { font-size:46px; font-weight:800; color:#7ee8fa; }
-  .lbl { font-size:11px; letter-spacing:2px; color: #a5a9e8; text-transform:uppercase; }
+    #textViewport { 
+      position: relative; font-size: 32px; font-family: monospace; 
+      height: 130px; overflow: hidden; width: 100%; padding: 0;
+    }
+    #textInner { 
+      position: relative; display: flex; flex-wrap: wrap; line-height: 60px; 
+      pointer-events: none; transition: transform 0.2s ease; font-weight: 600; 
+      color: rgba(255,255,255,0.2);
+    }
+    #textInner span { white-space: pre; display: inline-block; }
+    .correct { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+    .wrong { color: #ff6b81; background: rgba(255,107,129,0.2); border-radius: 4px; }
+    
+    #caret { 
+      position: absolute; width: 2px; height: 36px; background: #7ee8fa; 
+      box-shadow: 0 0 8px #7ee8fa; transition: all 0.05s ease; 
+      transform: translateY(12px); animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
 
-  /* Текст теперь без бэкграунда и рамок — эффект «в воздухе» */
-  #textViewport { 
-    position:relative; font-size:32px; font-family: monospace; 
-    height:130px; overflow:hidden; width: 100%; padding: 0px;
-    background: none; border: none;
-  }
-  #textInner { 
-    position:relative; display:flex; flex-wrap:wrap; line-height:60px; 
-    pointer-events: none; transition: transform 0.2s ease; font-weight: 600; 
-    color: rgba(255,255,255,0.2);
-  }
-  #textInner span { white-space:pre; display: inline-block; }
-  .correct { color:#8bf7a0; text-shadow: 0 0 10px rgba(139,247,160,0.3); }
-  .wrong { color:#ff6b81; background: rgba(255,107,129,0.2); border-radius:4px; }
-  
-  /* Идеально точная каретка прямо возле букв */
-  #caret { 
-    position:absolute; width:3px; height:36px; background:#7ee8fa; 
-    box-shadow:0 0 8px #7ee8fa; transition: all 0.05s ease; 
-    transform: translateY(12px); /* Точечное смещение к линии шрифта */
-  }
-  #hiddenInput { position:absolute; top:-9999px; left:-9999px; opacity:0; }
-  #overlay { text-align:center; color:rgba(255,255,255,0.4); font-size:14px; margin-top: 5px; }
+    #hiddenInput { position: absolute; top: -9999px; left: -9999px; opacity: 0; }
+    #overlay { text-align: center; color: rgba(255,255,255,0.4); font-size: 14px; margin-top: 5px; }
 
-  #controlBar { display: flex; justify-content: center; gap: 10px; align-items: center; flex-wrap: wrap; }
-  .btn { padding:10px 18px; border-radius:12px; font-size:13px; cursor:pointer; background: rgba(255,255,255,0.04); color:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.1); font-weight: 600; }
-  .btn.active { background: rgba(126,232,250,0.15); border-color: #7ee8fa; color: #7ee8fa; }
-  
-  #chatOpenBtn { background: linear-gradient(135deg, #7ee8fa, #eec0c6); color: #0b0c1f; border: none; font-weight: 700; }
+    .controls { display: flex; justify-content: center; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .btn { padding: 10px 18px; border-radius: 12px; font-size: 13px; cursor: pointer; background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.1); font-weight: 600; transition: 0.2s; }
+    .btn.active { background: rgba(126,232,250,0.15); border-color: #7ee8fa; color: #7ee8fa; }
+    
+    /* КОНТЕЙНЕР ДЛЯ НИЖНИХ КНОПОК РЯДОМ */
+    .bottom-row {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 10px;
+    }
 
-  #leaderboardPage { position: absolute; inset: -40px -10px; background: #0d0e21; z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
-  .leaderList { width: 100%; max-width: 450px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; }
-  .leaderRow { display: flex; justify-content: space-between; padding: 12px 16px; margin-bottom: 6px; background: rgba(255,255,255,0.03); border-radius: 10px; }
-  .userRow { border: 1px solid #7ee8fa; background: rgba(126,232,250,0.1); color: #7ee8fa; }
-</style>
+    /* СТИЛИ ДЛЯ УМЕНЬШЕННЫХ КНОПОК СНИЗУ */
+    .btn-bottom {
+      padding: 6px 16px !important;
+      font-size: 13px !important;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    .btn-chat {
+      background: rgba(126,232,250,0.05); color: #7ee8fa; border: 1px solid rgba(126,232,250,0.3);
+    }
+    .btn-chat:hover { background: linear-gradient(135deg, #7ee8fa, #eec0c6); color: #0b0c1f; border-color: transparent; }
+
+    .btn-leader {
+      background: rgba(255, 215, 0, 0.05); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.3);
+    }
+    .btn-leader:hover { background: linear-gradient(135deg, #ffd700, #ffb300); color: #0b0c1f; border-color: transparent; }
+
+    /* Таблица рейтинга модалка */
+    #leaderboardModal {
+      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(5, 5, 18, 0.85); justify-content: center; align-items: center; z-index: 100;
+    }
+    .modal-content {
+      background: #17212b; border: 1px solid rgba(255,255,255,0.1); padding: 30px;
+      border-radius: 20px; width: 90%; max-width: 450px; text-align: center;
+    }
+    .modal-content h3 { color: #ffd700; margin-bottom: 20px; font-size: 20px; }
+    .leader-list { text-align: left; margin-bottom: 20px; max-height: 250px; overflow-y: auto; }
+    .leader-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  </style>
 </head>
 <body>
 
 <div id="app">
-  <div id="profilePanel" style="display: none;">
+  <div class="user-panel">
     👤 <span id="profileUser" style="color: #7ee8fa; font-weight: bold;"></span>
-    <button id="logoutBtn">Выйти</button>
+    <button class="logout-btn" onclick="logout()">Выйти</button>
   </div>
 
-  <div id="registerScreen">
-    <h2>Создай профиль</h2>
-    <input type="text" id="usernameInput" placeholder="Никнейм..." maxlength="14" autocomplete="off">
-    <button id="saveUserBtn">Зарегистрироваться</button>
-  </div>
-
-  <div id="leaderboardPage">
-    <h2 style="margin-bottom: 20px; color: #ffca28; font-size: 28px;">🏆 Живой Рейтинг</h2>
-    <div class="leaderList" id="leaderboardList"></div>
-    <button class="btn" id="ratingCloseBtn" style="margin-top: 20px;">← Назад</button>
-  </div>
-
-  <div id="stats">
-    <div class="metric"><div class="val" id="wpmVal">0</div><div class="lbl">WPM</div></div>
-    <div class="metric"><div class="val" id="accVal">100%</div><div class="lbl">Точность</div></div>
-    <div class="metric"><div class="val" id="errVal">0</div><div class="lbl">Ошибки</div></div>
-    <div class="metric"><div class="val" id="timeVal">15</div><div class="lbl">Секунд</div></div>
+  <div class="stats-container">
+    <div class="stat-box"><div class="num" id="wpmVal">0</div><div class="label">WPM</div></div>
+    <div class="stat-box"><div class="num" id="accVal">100%</div><div class="label">Точность</div></div>
+    <div class="stat-box"><div class="num" id="errVal">0</div><div class="label">Ошибки</div></div>
+    <div class="stat-box"><div class="num" id="timeVal">15</div><div class="label">Секунд</div></div>
   </div>
 
   <div id="textViewport">
@@ -104,15 +123,27 @@
   <input id="hiddenInput" autocomplete="off" autocapitalize="off" spellcheck="false">
   <div id="overlay">Кликни и начни писать · Текст парит в воздухе!</div>
 
-  <div id="controlBar">
-    <button class="btn time-btn active" data-t="15">15 сек</button>
-    <button class="btn time-btn" data-t="30">30 сек</button>
-    <button class="btn time-btn" data-t="60">60 сек</button>
-    <button class="btn lang-btn active" data-l="ru">Русский</button>
-    <button class="btn lang-btn" data-l="en">English</button>
-    <button class="btn" id="ratingOpenBtn" style="color:#ffca28;">🏆 Рейтинг</button>
-    <button class="btn" id="restartBtn">⟳ Сброс</button>
-<button class="btn" id="chatOpenBtn" onclick="window.open('chat.html', '_blank')">💬 Чат в отдельной вкладке</button>  </div>
+  <div class="controls">
+    <button class="btn time-btn active" data-t="15" onclick="changeTime(15, this)">15 сек</button>
+    <button class="btn time-btn" data-t="30" onclick="changeTime(30, this)">30 сек</button>
+    <button class="btn time-btn" data-t="60" onclick="changeTime(60, this)">60 сек</button>
+    <button class="btn lang-btn active" data-l="ru" onclick="changeLang('ru', this)">Русский</button>
+    <button class="btn lang-btn" data-l="en" onclick="changeLang('en', this)">English</button>
+    <button class="btn" id="restartBtn" onclick="resetGame()">🔄 Сброс</button>
+  </div>
+
+  <div class="bottom-row">
+    <button class="btn-bottom btn-chat" id="chatOpenBtn" onclick="location.href='chat.html'">💬 Чат</button>
+    <button class="btn-bottom btn-leader" onclick="openLeaderboard()">🏆 Рейтинг</button>
+  </div>
+</div>
+
+<div id="leaderboardModal">
+  <div class="modal-content">
+    <h3>🏆 Таблица лидеров</h3>
+    <div class="leader-list" id="leaderList">Загрузка...</div>
+    <button class="btn" onclick="closeLeaderboard()" style="width: 100%;">Закрыть</button>
+  </div>
 </div>
 
 <script>
@@ -124,31 +155,11 @@ const DICTIONARIES = {
 let currentLang = 'ru';
 let currentUsername = localStorage.getItem('typing_user') || '';
 
-function checkAuth() {
-  if(!currentUsername) {
-    document.getElementById('registerScreen').style.display = 'flex';
-  } else {
-    document.getElementById('registerScreen').style.display = 'none';
-    document.getElementById('profilePanel').style.display = 'flex';
-    document.getElementById('profileUser').textContent = currentUsername;
-  }
+if (!currentUsername) {
+  currentUsername = prompt("Введите ваш никнейм:") || "Аноним";
+  localStorage.setItem('typing_user', currentUsername);
 }
-
-document.getElementById('saveUserBtn').addEventListener('click', () => {
-  const name = document.getElementById('usernameInput').value.trim();
-  if(name.length >= 2) {
-    currentUsername = name;
-    localStorage.setItem('typing_user', name);
-    checkAuth();
-    resetGame();
-  }
-});
-
-document.getElementById('logoutBtn').addEventListener('click', () => {
-  currentUsername = '';
-  localStorage.removeItem('typing_user');
-  location.reload();
-});
+document.getElementById('profileUser').textContent = currentUsername;
 
 let targetText = '', typed = '', timeLimit = 15, timeLeft = 15, timer = null, active = false;
 
@@ -182,8 +193,12 @@ function render() {
     document.getElementById('caret').style.left = span.offsetLeft + 'px';
     document.getElementById('caret').style.top = span.offsetTop + 'px';
     
+    document.getElementById('caret').style.animation = 'none';
+    void document.getElementById('caret').offsetWidth;
+    document.getElementById('caret').style.animation = 'blink 1s infinite';
+
     if(span.offsetTop > 60) {
-      document.getElementById('textInner').style.transform = `translateY(-${span.offsetTop - 0}px)`;
+      document.getElementById('textInner').style.transform = `translateY(-${span.offsetTop - 10}px)`;
     } else {
       document.getElementById('textInner').style.transform = 'translateY(0px)';
     }
@@ -191,7 +206,6 @@ function render() {
 }
 
 document.getElementById('hiddenInput').addEventListener('input', (e) => {
-  if(!currentUsername) return;
   typed = e.target.value;
   if(!active) {
     active = true;
@@ -227,7 +241,7 @@ async function saveScore() {
     });
   } catch(e) {}
   
-  alert(`Тест окончен! Твой результат: ${finalWpm} WPM`);
+  alert(`Тест окончен! Результат: ${finalWpm} WPM`);
   resetGame();
 }
 
@@ -241,54 +255,63 @@ function resetGame() {
   document.getElementById('errVal').textContent = '0';
   document.getElementById('overlay').style.display = 'block';
   generateText();
+  document.getElementById('hiddenInput').focus();
 }
 
-document.querySelectorAll('.time-btn').forEach(b => {
-  b.addEventListener('click', (e) => {
-    document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-    e.target.classList.add('active');
-    timeLimit = parseInt(e.target.dataset.t);
-    resetGame();
-  });
-});
+function changeTime(sec, el) {
+  document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+  el.classList.add('active');
+  timeLimit = sec;
+  resetGame();
+}
 
-document.querySelectorAll('.lang-btn').forEach(b => {
-  b.addEventListener('click', (e) => {
-    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-    e.target.classList.add('active');
-    currentLang = e.target.dataset.l;
-    resetGame();
-  });
-});
+function changeLang(lang, el) {
+  document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+  el.classList.add('active');
+  currentLang = lang;
+  resetGame();
+}
 
-document.getElementById('ratingOpenBtn').addEventListener('click', async () => {
-  document.getElementById('leaderboardPage').style.display = 'flex';
-  const list = document.getElementById('leaderboardList');
+async function openLeaderboard() {
+  document.getElementById('leaderboardModal').style.display = 'flex';
+  const list = document.getElementById('leaderList');
+  list.innerHTML = "Загрузка...";
   try {
     const res = await fetch('http://localhost:3000/api/leaders');
     const data = await res.json();
-    list.innerHTML = '';
-    data.leaders.forEach((p, idx) => {
-      list.innerHTML += `<div class="leaderRow ${p.name === currentUsername ? 'userRow' : ''}">
-        <span>#${idx+1} ${p.name}</span><strong>${p.wpm} WPM</strong>
-      </div>`;
-    });
-  } catch (e) { list.innerHTML = '<div style="color:red;">Сервер недоступен</div>'; }
-});
+    if(data.leaders.length === 0) {
+      list.innerHTML = "Рекордов пока нет. Будь первым!";
+    } else {
+      list.innerHTML = data.leaders.map((p, idx) => `
+        <div class="leader-item">
+          <span>${idx + 1}. ${p.name}</span>
+          <span style="color: #7ee8fa; font-weight: bold;">${p.wpm} WPM</span>
+        </div>
+      `).join('');
+    }
+  } catch (e) {
+    list.innerHTML = "Ошибка загрузки рейтинга.";
+  }
+}
 
-document.getElementById('ratingCloseBtn').addEventListener('click', () => {
-  document.getElementById('leaderboardPage').style.display = 'none';
-});
+function closeLeaderboard() {
+  document.getElementById('leaderboardModal').style.display = 'none';
+  document.getElementById('hiddenInput').focus();
+}
 
-document.getElementById('restartBtn').addEventListener('click', resetGame);
+function logout() {
+  localStorage.removeItem('typing_user');
+  location.reload();
+}
+
 document.body.addEventListener('click', (e) => {
-  if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
-    if(currentUsername) document.getElementById('hiddenInput').focus();
+  if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && !document.getElementById('leaderboardModal').contains(e.target)) {
+    document.getElementById('hiddenInput').focus();
   }
 });
 
-checkAuth();
 generateText();
+document.getElementById('hiddenInput').focus();
 </script>
 </body>
-</html> 
+</html>
