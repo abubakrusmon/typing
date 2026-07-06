@@ -2,571 +2,397 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Typing Speed Test</title>
+<title>Typing Speed Test — Abuabkr</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
-  html, body {
-    width:100%; height:100%;
+  body {
+    width:100vw; height:100vh;
     background: radial-gradient(circle at 50% 0%, #1e1e38 0%, #0d0e21 60%, #050512 100%);
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    font-family: 'Segoe UI', Arial, sans-serif;
     display:flex; align-items:center; justify-content:center;
     overflow:hidden;
-    cursor: text;
   }
 
-  #app { width:min(920px, 92vw); cursor: default; display: flex; flex-direction: column; gap: 15px; position: relative; }
+  #mainContainer { display: flex; width: 95vw; max-width: 1300px; height: 85vh; gap: 25px; }
+  
+  /* Игровая зона */
+  #app { flex: 1; display: flex; flex-direction: column; gap: 20px; position: relative; justify-content: center; }
 
-  /* ЭКРАН РЕГИСТРАЦИИ */
+  #profilePanel {
+    position: absolute; top: 0; right: 0; display: flex; align-items: center; gap: 12px;
+    background: rgba(255, 255, 255, 0.03); padding: 6px 14px; border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08); color: #fff; font-size: 14px; z-index: 10;
+  }
+  #logoutBtn { background: none; border: none; color: #ff6b81; font-weight: 700; cursor: pointer; margin-left: 10px; }
+
+  /* Экран профиля */
   #registerScreen {
-    position: absolute; inset: -20px;
-    background: #0d0e21;
-    z-index: 300; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    border-radius: 24px; color: #fff; text-align: center; padding: 40px;
+    position: absolute; inset: 0; background: #0d0e21; z-index: 300;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff;
   }
-  #registerScreen h2 { font-size: 36px; font-weight: 800; margin-bottom: 12px; background: linear-gradient(135deg, #7ee8fa, #eec0c6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  #registerScreen p { font-size: 15px; color: rgba(255,255,255,0.75); margin-bottom: 25px; }
-  #usernameInput {
-    padding: 16px 20px; font-size: 18px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.15);
-    background: rgba(255,255,255,0.05); color: #fff; width: 100%; max-width: 320px; text-align: center;
-    margin-bottom: 20px; font-weight: 600; outline: none; transition: border-color 0.2s;
-  }
-  #usernameInput:focus { border-color: #7ee8fa; box-shadow: 0 0 15px rgba(126,232,250,0.2); }
-  #saveUserBtn {
-    padding: 14px 40px; font-size: 16px; font-weight: 700; color: #0b0c1f;
-    background: linear-gradient(135deg, #7ee8fa, #eec0c6); border: none; border-radius: 14px;
-    cursor: pointer; box-shadow: 0 10px 25px rgba(126,232,250,0.3); transition: all 0.2s;
-  }
-  #saveUserBtn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(126,232,250,0.5); }
-
-  /* Приветственный экран / Стартовое меню */
-  #welcomeScreen {
-    position: absolute; inset: -20px;
-    background: rgba(11, 12, 31, 0.95);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    border-radius: 24px; color: #fff; text-align: center; padding: 40px;
-    transition: opacity 0.4s ease, transform 0.4s ease;
-  }
-  #welcomeScreen h1 { font-size: 42px; font-weight: 800; margin-bottom: 12px; background: linear-gradient(135deg, #7ee8fa, #eec0c6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  #welcomeScreen p { font-size: 16px; color: rgba(255,255,255,0.85); margin-bottom: 30px; max-width: 460px; line-height: 1.5; }
-  #startAppBtn {
-    padding: 16px 44px; font-size: 17px; font-weight: 700; color: #0b0c1f;
-    background: linear-gradient(135deg, #7ee8fa, #eec0c6); border: none; border-radius: 16px;
-    cursor: pointer; box-shadow: 0 12px 30px rgba(126,232,250,0.4); transition: all 0.25s ease;
-  }
-  #startAppBtn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 15px 35px rgba(126,232,250,0.6); }
+  #registerScreen h2 { font-size: 36px; margin-bottom: 15px; font-weight: 800; background: linear-gradient(135deg, #7ee8fa, #eec0c6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  #registerScreen p { color: rgba(255,255,255,0.6); margin-bottom: 20px; font-size: 14px; }
+  #usernameInput { padding: 16px 20px; font-size: 18px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: #fff; text-align: center; margin-bottom: 20px; outline: none; width: 300px; }
+  #saveUserBtn { padding: 16px 40px; font-size: 16px; font-weight: 700; color: #0b0c1f; background: linear-gradient(135deg, #7ee8fa, #eec0c6); border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 0 15px rgba(126,232,250,0.4); }
 
   /* Статистика */
-  #topPanel { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-  #stats { display:flex; justify-content:space-between; align-items:baseline; color:#c9ccf5; flex: 1; }
-  #stats .metric { text-align:center; }
-  #stats .val { font-size:42px; font-weight:800; color:#7ee8fa; text-shadow:0 0 18px rgba(126,232,250,.35); }
-  #stats .lbl { font-size:12px; letter-spacing:2px; color: #a5a9e8; opacity: 0.9; text-transform:uppercase; margin-top:2px; font-weight: 600; }
+  #stats { display:flex; justify-content:space-between; align-items:center; color:#c9ccf5; width: 100%; padding: 0 40px; }
+  .metric { text-align:center; }
+  .val { font-size:46px; font-weight:800; color:#7ee8fa; text-shadow: 0 0 10px rgba(126,232,250,0.3); }
+  .lbl { font-size:11px; letter-spacing:2px; color: #a5a9e8; text-transform:uppercase; margin-top: 4px; }
 
-  #timerRing { position:relative; width:64px; height:64px; margin: 0 20px; }
-  #timerRing svg { transform: rotate(-90deg); }
-  #timerRing circle { fill:none; stroke-width:5; }
-  #timerRing .bg { stroke: rgba(255,255,255,0.15); }
-  #timerRing .fg { stroke:#eec0c6; stroke-linecap:round; transition: stroke-dashoffset .3s linear; }
-  #timerRing .num {
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    font-size:20px; font-weight:700; color:#eec0c6; text-shadow: 0 0 10px rgba(238,192,198,0.5);
-  }
-
-  /* Текст */
-  #textViewport {
-    position:relative; font-size:36px; letter-spacing:0.5px; color:rgba(255,255,255,0.35);
-    font-family:'Consolas','Courier New',monospace; padding:20px 38px; height:150px; overflow:hidden; user-select:none;
-  }
-  #textInner {
-    position:relative; display:flex; flex-wrap:wrap; align-content:flex-start; max-width:820px; line-height:54px;
-    transition: transform .25s cubic-bezier(0.25, 1, 0.5, 1); will-change: transform; pointer-events: none; font-weight: 600;
-  }
-  #textInner span { white-space:pre; transition: color 0.12s ease, background 0.12s ease; }
-  #textInner .correct { color:#8bf7a0; text-shadow: 0 0 15px rgba(139,247,160,0.6); }
-  #textInner .wrong { color:#ff6b81; background: rgba(255,107,129,0.25); border-radius:4px; text-shadow: 0 0 10px rgba(255,107,129,0.5); }
+  /* Текст и каретка */
+  #textViewport { position:relative; font-size:32px; color:rgba(255,255,255,0.25); font-family: monospace; height:120px; overflow:hidden; width: 100%; padding: 10px; }
+  #textInner { position:relative; display:flex; flex-wrap:wrap; line-height:50px; pointer-events: none; transition: transform 0.2s; font-weight: 600; }
+  #textInner span { white-space:pre; }
+  .correct { color:#8bf7a0; text-shadow: 0 0 10px rgba(139,247,160,0.4); }
+  .wrong { color:#ff6b81; background: rgba(255,107,129,0.2); border-radius:4px; }
   
-  #caret {
-    position:absolute; top:0; left:0; width:3px; height:38px; background:#7ee8fa;
-    box-shadow:0 0 12px rgba(126,232,250,0.8); border-radius:2px;
-    transition: top 0.12s cubic-bezier(0.25, 1, 0.5, 1), left 0.08s cubic-bezier(0.25, 1, 0.5, 1);
-    animation: caretBlink 1s step-end infinite; pointer-events:none;
-  }
-  @keyframes caretBlink { 0%,49%{ opacity:1; } 50%,100%{ opacity:0.15; } }
-  @keyframes fadeInApp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+  #caret { position:absolute; width:3px; height:36px; background:#7ee8fa; box-shadow:0 0 8px #7ee8fa; transition: all 0.05s ease; }
 
-  #hiddenInput { position:absolute; top:-9999px; left:-9999px; opacity:0; pointer-events:none; }
-  #overlay { text-align:center; color:rgba(255,255,255,0.6); font-size:14px; min-height: 20px; margin-bottom: 5px; font-weight: 500; }
+  #hiddenInput { position:absolute; top:-9999px; left:-9999px; opacity:0; }
+  #overlay { text-align:center; color:rgba(255,255,255,0.4); font-size:14px; margin-top: 10px; }
 
-  #controlBar { display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 5px; }
-  #diffBar { display:flex; gap:10px; justify-content:center; align-items: center; flex-wrap: wrap; }
-  
-  .diffBtn, .selectBtn, #ratingOpenBtn {
-    padding:10px 20px; border-radius:12px; font-size:13px; cursor:pointer; font-weight: 600;
-    background: rgba(255,255,255,0.06); color:rgba(255,255,255,0.75); border:1px solid rgba(255,255,255,0.12);
-    transition: all .2s ease;
-  }
-  .diffBtn:hover, .selectBtn:hover, #ratingOpenBtn:hover { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3); }
-  .diffBtn.active { background: rgba(126,232,250,0.2); color:#7ee8fa; border-color: rgba(126,232,250,0.5); box-shadow: 0 4px 15px rgba(126,232,250,0.2); }
-  
-  #ratingOpenBtn { background: rgba(255, 202, 40, 0.08); color: #ffca28; border-color: rgba(255, 202, 40, 0.2); }
-  #ratingOpenBtn:hover { background: rgba(255, 202, 40, 0.2); border-color: #ffca28; box-shadow: 0 4px 15px rgba(255, 202, 40, 0.2); }
+  /* Панель управления */
+  #controlBar { display: flex; justify-content: center; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 15px; }
+  .btn { padding:10px 18px; border-radius:12px; font-size:13px; cursor:pointer; background: rgba(255,255,255,0.04); color:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.1); font-weight: 600; transition: 0.2s; }
+  .btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .btn.active { background: rgba(126,232,250,0.15); border-color: #7ee8fa; color: #7ee8fa; }
+  #ratingOpenBtn { color: #ffca28; background: rgba(255, 202, 40, 0.05); border-color: rgba(255, 202, 40, 0.2); }
+  #ratingOpenBtn:hover { background: rgba(255, 202, 40, 0.15); }
 
-  #restartBtn {
-    background: transparent; border: none; color: rgba(255,255,255,0.5); font-size: 24px; cursor: pointer;
-    transition: transform 0.25s ease, color 0.25s ease; padding: 5px 15px; margin-left: 5px;
-  }
-  #restartBtn:hover { color: #7ee8fa; transform: rotate(180deg); }
-
-  /* НОВОЕ КРАСИВОЕ МЕНЮ РЕЖИМОВ */
+  /* Выпадающее меню режимов */
   .dropdown { position: relative; display: inline-block; }
   .dropdown-content {
-    display: none; position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%);
-    background: #141635; min-width: 240px; border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 14px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); z-index: 10; overflow: hidden;
+    display: none; position: absolute; bottom: 45px; left: 0; background: #141635;
+    min-width: 200px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 400; overflow: hidden;
   }
-  .dropdown-content div { color: rgba(255,255,255,0.85); padding: 12px 18px; text-align: left; font-size: 13px; cursor: pointer; transition: all 0.15s; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-  .dropdown-content div:hover { background: rgba(126,232,250,0.2); color: #7ee8fa; padding-left: 22px; }
-  .dropdown.open .dropdown-content { display: block; }
+  .dropdown-content div { padding: 12px 16px; color: #fff; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+  .dropdown-content div:hover { background: rgba(255,255,255,0.05); color: #7ee8fa; }
+  .dropdown:hover .dropdown-content { display: block; }
 
-  /* Карточка результатов */
-  #resultCard {
-    display:none; margin-top:10px; padding:36px; border-radius:24px; text-align:center;
-    background: linear-gradient(145deg, rgba(20, 22, 53, 0.98), rgba(10, 11, 30, 0.99)); border:1px solid rgba(255,255,255,0.15);
-    box-shadow: 0 35px 80px rgba(0,0,0,0.7); animation: fadeInApp 0.4s ease-out;
-  }
-  #resultCard h2 { color:#fff; font-size:24px; margin-bottom:22px; font-weight:700; }
-  #resultCard .row { display:flex; justify-content:center; gap:60px; margin-bottom:26px; }
-  #resultCard .big { font-size:56px; font-weight:900; color:#7ee8fa; text-shadow:0 0 22px rgba(126,232,250,.4); }
-  #resultCard .small { font-size:12px; letter-spacing:2px; color: #a5a9e8; font-weight: 600; text-transform:uppercase; margin-top:4px; }
-  #resultCard button, .backBtn {
-    padding:16px 40px; font-size:15px; font-weight:700; color:#0b0c1f;
-    background: linear-gradient(135deg,#7ee8fa,#eec0c6); border:none; border-radius:14px;
-    cursor:pointer; box-shadow:0 10px 26px rgba(126,232,250,.3); transition: transform .15s;
-  }
-  #resultCard button:hover, .backBtn:hover { transform: translateY(-2px) scale(1.03); }
+  /* Экран рейтинга */
+  #leaderboardPage { position: absolute; inset: 0; background: #0d0e21; z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
+  .leaderList { width: 100%; max-width: 450px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; }
+  .leaderRow { display: flex; justify-content: space-between; padding: 12px 16px; margin-bottom: 6px; background: rgba(255,255,255,0.03); border-radius: 10px; }
+  .userRow { border: 1px solid #7ee8fa; background: rgba(126,232,250,0.1); color: #7ee8fa; font-weight: bold; }
 
-  /* СТРАНИЦА РЕЙТИНГА */
-  #leaderboardPage {
-    position: absolute; inset: -10px; background: #0d0e21; z-index: 200;
-    display: none; flex-direction: column; align-items: center; justify-content: center;
-    border-radius: 24px; color: #fff; padding: 30px; animation: fadeInApp 0.4s ease-out;
-  }
-  .leaderContainer { width: 100%; max-width: 500px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-  .leaderContainer h2 { color: #ffca28; font-size: 26px; margin-bottom: 20px; font-weight: 800; text-align: center; text-shadow: 0 0 15px rgba(255,202,40,0.4); }
-  
-  .leaderList { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
-  .leaderRow { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-radius: 10px; background: rgba(255,255,255,0.04); font-size: 16px; color: #fff; font-weight: 600; }
-  .leaderRow.userRow { background: rgba(126,232,250,0.22); border: 1px solid rgba(126,232,250,0.5); color: #7ee8fa; font-weight: 700; box-shadow: 0 0 15px rgba(126,232,250,0.2); }
-  .leaderPlace { font-weight: 800; width: 30px; color: #ffca28; font-size: 18px; }
-  .leaderName { flex: 1; margin-left: 5px; color: #ffffff; }
-  .leaderRow.userRow .leaderName { color: #7ee8fa; }
-  .leaderScore { font-weight: 700; font-family: monospace; color: #7ee8fa; }
-  .leaderRow.userRow .leaderScore { color: #8bf7a0; }
-
-  .recordBadge { text-align: center; background: rgba(255, 202, 40, 0.1); border: 1px solid rgba(255, 202, 40, 0.2); border-radius: 12px; padding: 10px; margin-top: 15px; font-size: 14px; color: #ffca28; font-weight: 700; }
-  .recordBadge span { font-size: 20px; font-weight: 900; margin-left: 5px; text-shadow: 0 0 10px rgba(255,202,40,0.5); }
+  /* Живой Чат */
+  #chatWrapper { width: 330px; background: rgba(20, 22, 53, 0.5); backdrop-filter: blur(10px); border-radius: 24px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; overflow: hidden; }
+  #chatHeader { padding: 18px; background: rgba(255,255,255,0.01); font-weight: 700; color: #7ee8fa; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 15px; }
+  #chatMessages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+  .chatMsg { background: rgba(255,255,255,0.03); padding: 10px 14px; border-radius: 12px; color: #fff; font-size: 14px; line-height: 1.4; border: 1px solid rgba(255,255,255,0.02); }
+  .chatMsg .uName { color: #eec0c6; font-weight: bold; font-size: 12px; margin-right: 6px; display: block; margin-bottom: 2px; }
+  #chatForm { padding: 12px; display: flex; gap: 8px; background: rgba(0,0,0,0.15); border-top: 1px solid rgba(255,255,255,0.05); }
+  #chatInput { flex: 1; padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; outline: none; font-size: 14px; }
+  #chatInput:focus { border-color: #7ee8fa; }
+  #chatSendBtn { padding: 0 16px; background: linear-gradient(135deg, #7ee8fa, #eec0c6); border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: #0b0c1f; }
 </style>
 </head>
 <body>
 
-<div id="app">
-  <div id="registerScreen">
-    <h2>Создай профиль</h2>
-    <p>Введите свой никнейм для участия в таблице рекордов:</p>
-    <input type="text" id="usernameInput" placeholder="Твой никнейм..." maxlength="14" autocomplete="off">
-    <button id="saveUserBtn">Зарегистрироваться</button>
-  </div>
-
-  <div id="welcomeScreen">
-    <h1>Typing Speed Test</h1>
-    <p>Проверь свою скорость печати, побеждай рекорды реальных игроков и займи заслуженное 1-ое место в мировом Топ-6 рейтинге!</p>
-    <button id="startAppBtn">Начать тест</button>
-  </div>
-
-  <div id="leaderboardPage">
-    <div class="leaderContainer">
-      <h2>🏆 Мировой Топ-6 Рейтинг</h2>
-      <div class="leaderList" id="leaderboardList"></div>
-      <div class="recordBadge">🔥 Твой личный рекорд: <span id="pageBestWpmVal">0</span> WPM</div>
+<div id="mainContainer">
+  <div id="app">
+    <div id="profilePanel" style="display: none;">
+      👤 <span id="profileUser" style="color: #7ee8fa; font-weight: bold;"></span>
+      <button id="logoutBtn">Выйти</button>
     </div>
-    <button class="backBtn" id="ratingCloseBtn">← Вернуться к игре</button>
-  </div>
 
-  <div id="topPanel">
+    <div id="registerScreen">
+      <h2>Создай профиль</h2>
+      <p>Введите свой никнейм для участия в таблице рекордов:</p>
+      <input type="text" id="usernameInput" placeholder="Никнейм..." maxlength="14" autocomplete="off">
+      <button id="saveUserBtn">Зарегистрироваться</button>
+    </div>
+
+    <div id="leaderboardPage">
+      <h2 style="margin-bottom: 20px; color: #ffca28; font-size: 28px;">🏆 Живой Рейтинг Участников</h2>
+      <div class="leaderList" id="leaderboardList"></div>
+      <button class="btn" id="ratingCloseBtn" style="margin-top: 20px; padding: 12px 30px;">← Назад к игре</button>
+    </div>
+
     <div id="stats">
       <div class="metric"><div class="val" id="wpmVal">0</div><div class="lbl">WPM</div></div>
       <div class="metric"><div class="val" id="accVal">100%</div><div class="lbl">Точность</div></div>
-      <div id="timerRing">
-        <svg width="64" height="64">
-          <circle class="bg" cx="32" cy="32" r="27"></circle>
-          <circle class="fg" id="ringFg" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="0"></circle>
-        </svg>
-        <div class="num" id="timeVal">30</div>
-      </div>
       <div class="metric"><div class="val" id="errVal">0</div><div class="lbl">Ошибки</div></div>
+      <div class="metric"><div class="val" id="timeVal">15</div><div class="lbl">Секунд</div></div>
     </div>
-  </div>
 
-  <div id="textViewport"><div id="textInner"></div><div id="caret"></div></div>
-  <input id="hiddenInput" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <div id="textViewport"><div id="textInner"></div><div id="caret"></div></div>
+    <input id="hiddenInput" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <div id="overlay">Кликни в любой точке экрана и начни печатать для старта</div>
 
-  <div id="overlay">Начни печатать, чтобы запустить таймер · ESC — сброс</div>
-
-  <div id="controlBar">
-    <div id="diffBar">
-      <div class="diffBtn active" data-t="15">15 сек</div>
-      <div class="diffBtn" data-t="30">30 сек</div>
-      <div class="diffBtn" data-t="60">60 сек</div>
-      <div style="width:1px;background:rgba(255,255,255,0.12);height:18px;margin:0 4px;"></div>
+    <div id="controlBar">
+      <button class="btn time-btn active" data-t="15">15 сек</button>
+      <button class="btn time-btn" data-t="30">30 сек</button>
+      <button class="btn time-btn" data-t="60">60 sec</button>
       
-      <div class="dropdown" id="modeDropdown">
-        <div class="selectBtn" id="currentModeLbl">🎲 Режим: Слова</div>
+      <div class="dropdown">
+        <button class="btn" id="modeBtn">🎲 Режим: Слова</button>
         <div class="dropdown-content">
-          <div data-mode="words">🎲 Случайные слова</div>
-          <div data-mode="tech">💻 Технологии и будущее</div>
-          <div data-mode="nature">🌲 Философия природы</div>
-          <div data-mode="space">🚀 Космос и Вселенная</div>
+          <div onclick="changeMode('words', '🎲 Режим: Слова')">🎲 Случайные слова</div>
+          <div onclick="changeMode('tech', '💻 Технологии')">💻 Технологии и будущее</div>
+          <div onclick="changeMode('nature', '🌲 Философия природы')">🌲 Философия природы</div>
+          <div onclick="changeMode('space', '🚀 Космос')">🚀 Космос и Вселенная</div>
         </div>
       </div>
 
-      <div style="width:1px;background:rgba(255,255,255,0.12);height:18px;margin:0 4px;"></div>
-      <div class="diffBtn" data-lang="ru">Русский</div>
-      <div class="diffBtn active" data-lang="en">English</div>
+      <button class="btn lang-btn active" data-l="ru">Русский</button>
+      <button class="btn lang-btn" data-l="en">English</button>
       
-      <div style="width:1px;background:rgba(255,255,255,0.12);height:18px;margin:0 4px;"></div>
-      <button id="ratingOpenBtn">🏆 Рейтинг</button>
-      
-      <button id="restartBtn" title="Начать заново (ESC)">&#8635;</button>
+      <button class="btn" id="ratingOpenBtn">🏆 Рейтинг</button>
+      <button class="btn" id="restartBtn">⟳ Сброс</button>
     </div>
   </div>
 
-  <div id="resultCard">
-    <h2>Твой результат</h2>
-    <div class="row">
-      <div><div class="big" id="finalWpm">0</div><div class="small">Слов / Мин</div></div>
-      <div><div class="big" id="finalAcc">0%</div><div class="small">Точность</div></div>
-      <div><div class="big" id="finalErr">0</div><div class="small">Ошибок</div></div>
-    </div>
-    <button onclick="startNew()">Ещё раз</button>
+  <div id="chatWrapper">
+    <div id="chatHeader">💬 Онлайн-чат участников</div>
+    <div id="chatMessages"></div>
+    <form id="chatForm">
+      <input type="text" id="chatInput" placeholder="Сообщение в чат..." autocomplete="off" maxlength="100">
+      <button type="submit" id="chatSendBtn">></button>
+    </form>
   </div>
 </div>
 
 <script>
-// Наборы слов под новые режимы со скриншота
-const WORDS_RU = "время жизнь рука дело мир слово друг утро море небо солнце дождь снег ветер лед дом река гора поле книга стул стол окно дверь свет тень звук шум хлеб вода чай".split(' ');
-const WORDS_EN = "process hand discovery artist thought practice noise experience change morning fox group way smell chair relation trust case quick stop book task machine speed shape musician invention theory project squad".split(' ');
+// СЛОВАРИ ДЛЯ РАЗНЫХ РЕЖИМОВ И ЯЗЫКОВ
+const DICTIONARIES = {
+  ru: {
+    words: "время жизнь рука дело мир слово друг утро море небо солнце дождь снег ветер лед дом река гора поле книга стул стол окно дверь свет тень звук".split(' '),
+    tech: "процессор интернет сервер программа код данные экран квант робот алгоритм база сеть интерфейс массив функция кибер автоматика память система поток".split(' '),
+    nature: "дерево лист земля трава цветок корень капля скала туман гроза рассвет закат лес океан тропа стихия флора фауна фаза климат зерно оазис".split(' '),
+    space: "космос ракета звезда планета орбита комета вакуум галактика метеорит спутник телескоп гравитация пульсар туманность зонд квазар вселенная астронавт".split(' ')
+  },
+  en: {
+    words: "process hand discovery artist thought practice noise experience change morning fox group way smell chair relation trust case quick stop book task machine speed shape".split(' '),
+    tech: "processor internet server program code data screen quantum robot algorithm database network interface array function cyber memory system stream".split(' '),
+    nature: "tree leaf earth grass flower root drop rock fog storm sunrise sunset forest ocean trail flora fauna phase climate seed oasis".split(' '),
+    space: "space rocket star planet orbit comet vacuum galaxy meteorite satellite telescope gravity pulsar nebula probe quasar universe astronaut".split(' ')
+  }
+};
 
-const TECH_RU = "технологии будущее интернет нейросеть робот алгоритм космос квант код программирование сервер кибербезопасность автоматизация разработка девайс процессор база гаджет".split(' ');
-const TECH_EN = "technology future internet AI robot algorithm quantum code software server cybersecurity automation development device processor database gadget hardware intelligence".split(' ');
+let currentLang = 'ru';
+let currentCategory = 'words';
+let currentUsername = localStorage.getItem('typing_user') || '';
+let ws;
 
-const NATURE_RU = "философия природа жизнь гармония вселенная сознание стихия эволюция биосфера планета экология дерево энергия баланс разум истина земля существование концепция".split(' ');
-const NATURE_EN = "philosophy nature life harmony universe consciousness element evolution biosphere planet ecology tree energy balance mind truth earth existence concept organic".split(' ');
-
-const SPACE_RU = "космос вселенная галактика звезда планета комета астероид ракета орбита телескоп вакуум гравитация спутник туманность метеорит марс солнце черная дыра бесконечность".split(' ');
-const SPACE_EN = "space universe galaxy star planet comet asteroid rocket orbit telescope vacuum gravity satellite nebula meteorite mars sun black hole infinity astronomy".split(' ');
-
-let currentLang = 'en'; // Судя по скринам, стоял английский
-let selectedMode = 'words'; 
-let isWelcomeRemoved = false;
-let currentUsername = localStorage.getItem('typing_username') || '';
-
-const DEFAULT_LEADERS = [
-  { name: "NeoCyber", wpm: 88, isUser: false },
-  { name: "FastFinger", wpm: 74, isUser: false },
-  { name: "KeyboardHero", wpm: 61, isUser: false },
-  { name: "TypeMaster", wpm: 52, isUser: false },
-  { name: "Speedy", wpm: 40, isUser: false },
-  { name: "SlowMo", wpm: 25, isUser: false }
-];
-
-let leaders = JSON.parse(localStorage.getItem('typing_leaders')) || DEFAULT_LEADERS;
-let personalBest = parseInt(localStorage.getItem('typing_best_wpm')) || 0;
-
-function genWords(n){
-  let pool = [];
-  if (selectedMode === 'words') pool = currentLang === 'ru' ? WORDS_RU : WORDS_EN;
-  else if (selectedMode === 'tech') pool = currentLang === 'ru' ? TECH_RU : TECH_EN;
-  else if (selectedMode === 'nature') pool = currentLang === 'ru' ? NATURE_RU : NATURE_EN;
-  else if (selectedMode === 'space') pool = currentLang === 'ru' ? SPACE_RU : SPACE_EN;
-
-  let arr = [];
-  for(let i=0; i<n; i++) arr.push(pool[Math.floor(Math.random()*pool.length)]);
-  return arr.join(' ');
+// Инициализация веб-сокета для чата
+function initChat() {
+  if (ws) return;
+  ws = new WebSocket('ws://localhost:3000');
+  ws.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+    const box = document.getElementById('chatMessages');
+    if(data.type === 'history') {
+      box.innerHTML = '';
+      data.messages.forEach(m => addMsg(m));
+    } else if(data.type === 'new_message') {
+      addMsg(data.message);
+    }
+  };
+  ws.onclose = () => { ws = null; setTimeout(initChat, 2000); };
 }
 
-let targetText = '';
-let typed = '';
-let startTime = null;
-let timeLimit = 15;
-let timeLeft = 15;
-let timerInterval = null;
-let errors = 0;
-let finished = false;
+function addMsg(m) {
+  const box = document.getElementById('chatMessages');
+  box.innerHTML += `<div class="chatMsg"><span class="uName">${m.username}</span>${m.text}</div>`;
+  box.scrollTop = box.scrollHeight;
+}
 
-const textViewport = document.getElementById('textViewport');
-const textInner = document.getElementById('textInner');
-const caret = document.getElementById('caret');
-const hiddenInput = document.getElementById('hiddenInput');
-const ringFg = document.getElementById('ringFg');
-const modeDropdown = document.getElementById('modeDropdown');
-const currentModeLbl = document.getElementById('currentModeLbl');
-const welcomeScreen = document.getElementById('welcomeScreen');
-const leaderboardPage = document.getElementById('leaderboardPage');
-const registerScreen = document.getElementById('registerScreen');
+document.getElementById('chatForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const input = document.getElementById('chatInput');
+  if(!input.value.trim() || !ws || ws.readyState !== WebSocket.OPEN) return;
+  ws.send(JSON.stringify({ type: 'message', username: currentUsername, text: input.value.trim() }));
+  input.value = '';
+});
 
-const CIRCUM = 169.6;
-const LINE_HEIGHT = 54;
-let translateY = 0;
-
-function checkRegistration() {
-  if (!currentUsername) {
-    registerScreen.style.display = 'flex';
+function checkAuth() {
+  if(!currentUsername) {
+    document.getElementById('registerScreen').style.display = 'flex';
   } else {
-    registerScreen.style.display = 'none';
+    document.getElementById('registerScreen').style.display = 'none';
+    document.getElementById('profilePanel').style.display = 'flex';
+    document.getElementById('profileUser').textContent = currentUsername;
+    initChat();
   }
 }
 
 document.getElementById('saveUserBtn').addEventListener('click', () => {
-  const inputVal = document.getElementById('usernameInput').value.trim();
-  if (inputVal.length >= 2) {
-    currentUsername = inputVal;
-    localStorage.setItem('typing_username', currentUsername);
-    registerScreen.style.display = 'none';
-    if(isWelcomeRemoved) hiddenInput.focus();
-  } else {
-    alert('Пожалуйста, введите никнейм (минимум 2 символа).');
+  const name = document.getElementById('usernameInput').value.trim();
+  if(name.length >= 2) {
+    currentUsername = name;
+    localStorage.setItem('typing_user', name);
+    checkAuth();
+    resetGame();
   }
 });
 
-function renderText(){
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  currentUsername = '';
+  localStorage.removeItem('typing_user');
+  location.reload();
+});
+
+// Логика игры
+let targetText = '', typed = '', timeLimit = 15, timeLeft = 15, timer = null, active = false, errors = 0;
+
+function generateText() {
+  let res = [];
+  const dict = DICTIONARIES[currentLang][currentCategory];
+  for(let i=0; i<80; i++) res.push(dict[Math.floor(Math.random()*dict.length)]);
+  targetText = res.join(' ');
+  typed = '';
+  document.getElementById('hiddenInput').value = '';
+  render();
+}
+
+function render() {
   let html = '';
-  for(let i=0; i<targetText.length; i++){
-    const ch = targetText[i];
-    if(i < typed.length){
-      html += `<span class="${typed[i]===ch?'correct':'wrong'}">${ch===' '?'&nbsp;':ch}</span>`;
+  errors = 0;
+  for(let i=0; i<targetText.length; i++) {
+    if(i < typed.length) {
+      if (typed[i] === targetText[i]) {
+        html += `<span class="correct">${targetText[i]}</span>`;
+      } else {
+        html += `<span class="wrong">${targetText[i]}</span>`;
+        errors++;
+      }
     } else {
-      html += `<span>${ch===' '?'&nbsp;':ch}</span>`;
+      html += `<span>${targetText[i]}</span>`;
     }
   }
-  textInner.innerHTML = html;
-  updateCaretAndScroll();
+  document.getElementById('textInner').innerHTML = html;
+  document.getElementById('errVal').textContent = errors;
+  
+  const span = document.getElementById('textInner').children[typed.length];
+  if(span) {
+    document.getElementById('caret').style.left = span.offsetLeft + 'px';
+    document.getElementById('caret').style.top = span.offsetTop + 'px';
+  }
 }
 
-function updateCaretAndScroll(){
-  const spans = textInner.children;
-  if(spans.length === 0) return;
+document.getElementById('hiddenInput').addEventListener('input', (e) => {
+  if(!currentUsername) return;
+  typed = e.target.value;
+  if(!active) {
+    active = true;
+    document.getElementById('overlay').style.display = 'none';
+    timer = setInterval(() => {
+      timeLeft--;
+      document.getElementById('timeVal').textContent = timeLeft;
+      if(timeLeft <= 0) {
+        clearInterval(timer);
+        saveScore();
+      }
+    }, 1000);
+  }
   
-  const idx = Math.min(typed.length, spans.length-1);
-  const target = spans[idx];
-  const atEnd = typed.length >= spans.length;
+  const correct = typed.split('').filter((c, i) => c === targetText[i]).length;
+  const spentTime = (timeLimit - timeLeft) || 1;
+  document.getElementById('wpmVal').textContent = Math.round((correct / 5) / (spentTime / 60));
+  document.getElementById('accVal').textContent = typed.length ? Math.round((correct / typed.length) * 100) + '%' : '100%';
   
-  const targetRect = target.getBoundingClientRect();
-  const viewRect = textViewport.getBoundingClientRect();
-  
-  const left = atEnd ? (targetRect.left - viewRect.left + target.offsetWidth) : (targetRect.left - viewRect.left);
-  const top = target.offsetTop;
+  render();
+});
 
-  const currentLine = Math.round(top / LINE_HEIGHT);
-  const targetTranslate = -Math.max(0, currentLine - 1) * LINE_HEIGHT;
-  translateY = targetTranslate;
-  textInner.style.transform = `translateY(${translateY}px)`;
-
-  caret.style.left = left + "px";
-  caret.style.top = (top + translateY + 20 + 8) + "px";
+async function saveScore() {
+  active = false;
+  const correct = typed.split('').filter((c, i) => c === targetText[i]).length;
+  const finalWpm = Math.round((correct / 5) / (timeLimit / 60));
+  
+  try {
+    await fetch('http://localhost:3000/api/score', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: currentUsername, wpm: finalWpm })
+    });
+  } catch(e) { console.log("Сервер недоступен"); }
+  
+  alert(`Тест окончен! Твой результат: ${finalWpm} WPM`);
+  resetGame();
 }
 
-function startNew(){
-  targetText = genWords(150);
-  typed = '';
-  startTime = null;
+function resetGame() {
+  clearInterval(timer);
   timeLeft = timeLimit;
-  errors = 0;
-  finished = false;
-  clearInterval(timerInterval);
+  active = false;
   document.getElementById('timeVal').textContent = timeLeft;
   document.getElementById('wpmVal').textContent = '0';
   document.getElementById('accVal').textContent = '100%';
   document.getElementById('errVal').textContent = '0';
-  ringFg.style.strokeDashoffset = 0;
-  document.getElementById('resultCard').style.display = 'none';
   document.getElementById('overlay').style.display = 'block';
-  document.getElementById('overlay').textContent = currentLang==='ru'
-    ? 'Начни печатать, чтобы запустить таймер · ESC — сброс'
-    : 'Start typing to begin the timer · ESC — reset';
-  renderText();
-  hiddenInput.value = '';
+  generateText();
+}
+
+function changeMode(category, label) {
+  currentCategory = category;
+  document.getElementById('modeBtn').textContent = label;
+  resetGame();
+}
+
+// Слушатели кнопок времени
+document.querySelectorAll('.time-btn').forEach(b => {
+  b.addEventListener('click', (e) => {
+    document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+    e.target.classList.add('active');
+    timeLimit = parseInt(e.target.dataset.t);
+    resetGame();
+  });
+});
+
+// Слушатели кнопок языка
+document.querySelectorAll('.lang-btn').forEach(b => {
+  b.addEventListener('click', (e) => {
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+    e.target.classList.add('active');
+    currentLang = e.target.dataset.l;
+    resetGame();
+  });
+});
+
+document.getElementById('ratingOpenBtn').addEventListener('click', async () => {
+  document.getElementById('leaderboardPage').style.display = 'flex';
+  const list = document.getElementById('leaderboardList');
+  list.innerHTML = '<div style="color:gray;">Загрузка...</div>';
   
-  if(isWelcomeRemoved && leaderboardPage.style.display !== 'flex' && currentUsername) {
-    setTimeout(() => hiddenInput.focus(), 20);
+  try {
+    const res = await fetch('http://localhost:3000/api/leaders');
+    const data = await res.json();
+    list.innerHTML = '';
+    
+    if(!data.leaders.length) {
+      list.innerHTML = '<div style="color:gray; text-align:center;">Рейтинг пуст. Установи первый рекорд!</div>';
+    } else {
+      data.leaders.forEach((p, idx) => {
+        list.innerHTML += `<div class="leaderRow ${p.name === currentUsername ? 'userRow' : ''}">
+          <span>#${idx+1} ${p.name}</span>
+          <strong>${p.wpm} WPM</strong>
+        </div>`;
+      });
+    }
+  } catch (e) {
+    list.innerHTML = '<div style="color:#ff6b81; text-align:center;">Не удалось подключиться к серверу рекордов.</div>';
   }
-}
+});
 
-function startTimer(){
-  startTime = Date.now();
-  document.getElementById('overlay').style.display = 'none';
-  timerInterval = setInterval(()=>{
-    timeLeft -= 1;
-    document.getElementById('timeVal').textContent = Math.max(0,timeLeft);
-    ringFg.style.strokeDashoffset = CIRCUM * (1 - timeLeft/timeLimit);
-    updateLiveStats();
-    if(timeLeft <= 0){ endGame(); }
-  }, 1000);
-}
-
-function updateLiveStats(){
-  if(!startTime) return;
-  const elapsedMin = (Date.now()-startTime)/60000;
-  const correctChars = typed.split('').filter((c,i)=>c===targetText[i]).length;
-  const wpm = elapsedMin>0 ? Math.round((correctChars/5)/elapsedMin) : 0;
-  const acc = typed.length>0 ? Math.round((correctChars/typed.length)*100) : 100;
-  document.getElementById('wpmVal').textContent = wpm;
-  document.getElementById('accVal').textContent = acc+'%';
-  document.getElementById('errVal').textContent = errors;
-}
-
-function renderLeaderboardView() {
-  const listContainer = document.getElementById('leaderboardList');
-  listContainer.innerHTML = '';
-  
-  leaders.forEach((player, index) => {
-    const row = document.createElement('div');
-    row.className = `leaderRow ${player.isUser ? 'userRow' : ''}`;
-    row.innerHTML = `
-      <span class="leaderPlace">#${index + 1}</span>
-      <span class="leaderName">${player.isUser ? currentUsername + " (Вы)" : player.name}</span>
-      <span class="leaderScore">${player.wpm} WPM</span>
-    `;
-    listContainer.appendChild(row);
-  });
-  
-  document.getElementById('pageBestWpmVal').textContent = personalBest;
-}
-
-function updateLeaderboardData(userWpm) {
-  leaders = leaders.filter(l => !l.isUser);
-  leaders.push({ name: currentUsername, wpm: userWpm, isUser: true });
-  leaders.sort((a, b) => b.wpm - a.wpm);
-  leaders = leaders.slice(0, 6);
-  localStorage.setItem('typing_leaders', JSON.stringify(leaders));
-}
-
-function endGame(){
-  finished = true;
-  clearInterval(timerInterval);
-  const elapsedMin = timeLimit/60;
-  const correctChars = typed.split('').filter((c,i)=>c===targetText[i]).length;
-  const wpm = Math.round((correctChars/5)/elapsedMin);
-  const acc = typed.length>0 ? Math.round((correctChars/typed.length)*100) : 100;
-  
-  document.getElementById('finalWpm').textContent = wpm;
-  document.getElementById('finalAcc').textContent = acc+'%';
-  document.getElementById('finalErr').textContent = errors;
-  
-  if(wpm > personalBest) {
-    personalBest = wpm;
-    localStorage.setItem('typing_best_wpm', personalBest);
+document.getElementById('leaderboardPage').addEventListener('click', (e) => {
+  if(e.target.id === 'ratingCloseBtn' || e.target === document.getElementById('leaderboardPage')) {
+    document.getElementById('leaderboardPage').style.display = 'none';
   }
-  
-  updateLeaderboardData(wpm);
-  document.getElementById('resultCard').style.display = 'block';
-  hiddenInput.blur();
-}
+});
 
-hiddenInput.addEventListener('input', (e)=>{
-  if(finished || !isWelcomeRemoved || leaderboardPage.style.display === 'flex' || !currentUsername) return;
-  if(!startTime) startTimer();
-
-  const val = hiddenInput.value;
-  if(val.length > typed.length){
-    const newChar = val[val.length-1];
-    const idx = typed.length;
-    if(idx < targetText.length && newChar !== targetText[idx]){ errors++; }
+document.getElementById('restartBtn').addEventListener('click', resetGame);
+document.body.addEventListener('click', (e) => {
+  if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && !e.target.closest('.dropdown-content')) {
+    if(currentUsername) document.getElementById('hiddenInput').focus();
   }
-  typed = val;
-  renderText();
-  updateLiveStats();
-
-  if(typed.length >= targetText.length){ endGame(); }
 });
 
-document.getElementById('startAppBtn').addEventListener('click', (e) => {
-  e.stopPropagation();
-  welcomeScreen.style.opacity = '0';
-  welcomeScreen.style.transform = 'scale(0.95)';
-  setTimeout(() => {
-    welcomeScreen.style.display = 'none';
-    isWelcomeRemoved = true;
-    if(currentUsername) hiddenInput.focus();
-  }, 400);
-});
-
-document.getElementById('ratingOpenBtn').addEventListener('click', (e) => {
-  e.stopPropagation();
-  if(!currentUsername) return;
-  clearInterval(timerInterval);
-  renderLeaderboardView();
-  leaderboardPage.style.display = 'flex';
-  hiddenInput.blur();
-});
-
-document.getElementById('ratingCloseBtn').addEventListener('click', (e) => {
-  e.stopPropagation();
-  leaderboardPage.style.display = 'none';
-  startNew();
-});
-
-document.getElementById('restartBtn').addEventListener('click', (e) => { e.stopPropagation(); startNew(); });
-addEventListener('keydown', (e)=>{ if(e.code === 'Escape' && isWelcomeRemoved && leaderboardPage.style.display !== 'flex'){ startNew(); } });
-
-document.querySelectorAll('.diffBtn[data-t]').forEach(btn=>{
-  btn.addEventListener('click', (e)=>{
-    e.stopPropagation();
-    document.querySelectorAll('.diffBtn[data-t]').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    timeLimit = parseInt(btn.dataset.t);
-    startNew();
-  });
-});
-
-document.querySelectorAll('.diffBtn[data-lang]').forEach(btn=>{
-  btn.addEventListener('click', (e)=>{
-    e.stopPropagation();
-    document.querySelectorAll('.diffBtn[data-lang]').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    currentLang = btn.dataset.lang;
-    startNew();
-  });
-});
-
-// Открытие нового выпадающего списка
-currentModeLbl.addEventListener('click', (e) => {
-  e.stopPropagation();
-  if(isWelcomeRemoved && leaderboardPage.style.display !== 'flex') modeDropdown.classList.toggle('open');
-});
-
-// Обработка кликов по новым режимам со скриншота
-document.querySelectorAll('.dropdown-content div').forEach(item => {
-  item.addEventListener('click', (e) => {
-    e.stopPropagation();
-    selectedMode = item.dataset.mode;
-    if(selectedMode === 'words') currentModeLbl.textContent = "🎲 Режим: Слова";
-    if(selectedMode === 'tech') currentModeLbl.textContent = "💻 Режим: Технологии";
-    if(selectedMode === 'nature') currentModeLbl.textContent = "🌲 Режим: Философия";
-    if(selectedMode === 'space') currentModeLbl.textContent = "🚀 Режим: Космос";
-    modeDropdown.classList.remove('open');
-    startNew();
-  });
-});
-
-document.addEventListener('click', () => {
-  modeDropdown.classList.remove('open');
-  if(!finished && isWelcomeRemoved && leaderboardPage.style.display !== 'flex' && currentUsername) hiddenInput.focus();
-});
-
-checkRegistration();
-startNew();
+checkAuth();
+generateText();
 </script>
 </body>
 </html>
