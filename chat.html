@@ -53,12 +53,12 @@
 </div>
 
 <script>
+// Авто-определение хоста компьютера в Wi-Fi сети
 const currentHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'localhost'
-  : '192.168.1.5'; // <-- ВСТАВЬ СВОЙ IP СЮДА, ЕСЛИ ОН ДРУГОЙ
+  : '192.168.1.5'; // <-- Если твой IP на компе изменился, вставь новые цифры сюда
 
 const WS_URL = `ws://${currentHost}:3000`;
-
 const username = localStorage.getItem('typing_user') || 'Аноним';
 let ws;
 
@@ -69,20 +69,35 @@ function connect() {
     const statusEl = document.getElementById('status');
     statusEl.className = 'status online';
     statusEl.textContent = '● Онлайн';
-    ws.send(JSON.stringify({ type: 'system', text: `Пользователь ${username} вошел в чат` }));
+    
+    ws.send(JSON.stringify({ type: 'system', name: username, text: `Пользователь ${username} вошел в чат` }));
   };
 
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
     const box = document.getElementById('messages');
+    
     if (data.type === 'system') {
-      box.innerHTML += `<div class="msg system">${data.text}</div>`;
+      let sysText = data.text || data.message || '';
+      if (typeof sysText === 'object') sysText = sysText.text || sysText.message || JSON.stringify(sysText);
+      box.innerHTML += `<div class="msg system">${sysText}</div>`;
     } else {
-      const isMy = data.username === username;
+      // Защита от [object Object] в имени пользователя
+      let msgUser = data.username || data.name || 'Аноним';
+      if (typeof msgUser === 'object') msgUser = msgUser.name || msgUser.username || 'Аноним';
+
+      // Защита от [object Object] в тексте сообщения
+      let msgText = data.text || data.message || '';
+      if (typeof msgText === 'object') {
+        msgText = msgText.text || msgText.message || msgText.data || JSON.stringify(msgText);
+      }
+      
+      const isMy = msgUser === username;
+      
       box.innerHTML += `
         <div class="msg ${isMy ? 'my' : 'other'}">
-          <span class="msg-user" style="color:${isMy ? '#7ee8fa' : '#ffd700'}">${data.username}</span>
-          <div>${data.text}</div>
+          <span class="msg-user" style="color:${isMy ? '#7ee8fa' : '#ffd700'}">${msgUser}</span>
+          <div>${msgText}</div>
         </div>
       `;
     }
@@ -91,8 +106,8 @@ function connect() {
 
   ws.onclose = () => {
     const statusEl = document.getElementById('status');
-    statusEl.className = 'status online'; // ставим визуально, пока реконнект
-    statusEl.textContent = '● Переподключение...';
+    statusEl.className = 'status offline';
+    statusEl.textContent = '● Отключен. Переподключение...';
     setTimeout(connect, 3000);
   };
 }
@@ -100,10 +115,13 @@ function connect() {
 function send() {
   const input = document.getElementById('msgInput');
   if(!input.value.trim() || ws.readyState !== WebSocket.OPEN) return;
+  
   ws.send(JSON.stringify({
     type: 'message',
     username: username,
-    text: input.value.trim()
+    name: username,
+    text: input.value.trim(),
+    message: input.value.trim()
   }));
   input.value = '';
 }
