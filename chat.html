@@ -56,7 +56,7 @@
 // Авто-определение хоста компьютера в Wi-Fi сети
 const currentHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'localhost'
-  : '192.168.1.5'; // <-- Если твой IP на компе изменился, вставь новые цифры сюда
+  : '192.168.31.142'; // <-- Твой актуальный IP-адрес установлен!
 
 const WS_URL = `ws://${currentHost}:3000`;
 const username = localStorage.getItem('typing_user') || 'Аноним';
@@ -82,11 +82,9 @@ function connect() {
       if (typeof sysText === 'object') sysText = sysText.text || sysText.message || JSON.stringify(sysText);
       box.innerHTML += `<div class="msg system">${sysText}</div>`;
     } else {
-      // Защита от [object Object] в имени пользователя
       let msgUser = data.username || data.name || 'Аноним';
       if (typeof msgUser === 'object') msgUser = msgUser.name || msgUser.username || 'Аноним';
 
-      // Защита от [object Object] в тексте сообщения
       let msgText = data.text || data.message || '';
       if (typeof msgText === 'object') {
         msgText = msgText.text || msgText.message || msgText.data || JSON.stringify(msgText);

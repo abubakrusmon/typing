@@ -7,71 +7,61 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Массив для хранения истории последних 50 сообщений
-let messageHistory = [];
-// Массив для хранения рекордов (из твоего основного кода)
-let leaderboards = [];
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 
-// API для сохранения рекордов скорости печати
+// Хранилище лидеров в памяти
+let leaders = [];
+
+// API для рейтинга
 app.post('/api/score', (req, res) => {
   const { username, wpm } = req.body;
   if (!username) return res.status(400).json({ error: 'No username' });
   
-  leaderboards.push({ name: username, wpm: parseInt(wpm) || 0 });
-  leaderboards.sort((a, b) => b.wpm - a.wpm);
-  leaderboards = leaderboards.slice(0, 10); // оставляем топ-10
+  leaders.push({ name: username, wpm: parseInt(wpm) || 0 });
+  leaders.sort((a, b) => b.wpm - a.wpm);
+  leaders = leaders.slice(0, 10); // оставляем топ-10
   
-  res.json({ success: true });
+  res.json({ success: true, leaders });
 });
 
-// API для получения таблицы лидеров
 app.get('/api/leaders', (req, res) => {
-  res.json({ leaders: leaderboards });
+  res.json({ leaders });
 });
 
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
-
+// Логика чата через WebSocket
 wss.on('connection', (ws) => {
-  // При подключении нового пользователя отправляем ему историю чата
-  ws.send(JSON.stringify({
-    type: 'history',
-    messages: messageHistory
-  }));
+  console.log('Новое подключение по Wi-Fi');
 
   ws.on('message', (message) => {
     try {
       const data = JSON.parse(message);
+      
+      // Формируем чистый ответ без лишней вложенности объектов
+      const reply = {
+        type: data.type || 'message',
+        username: data.username || data.name || 'Аноним',
+        text: data.text || data.message || ''
+      };
 
-      if (data.type === 'message') {
-        const newMsg = {
-          username: data.username || 'Аноним',
-          text: data.text
-        };
-
-        // Сохраняем в историю
-        messageHistory.push(newMsg);
-        if (messageHistory.length > 50) messageHistory.shift();
-
-        // Рассылаем сообщение ВСЕМ подключенным пользователям
-        const broadcastData = JSON.stringify({
-          type: 'new_message',
-          message: newMsg
-        });
-
-        wss.clients.forEach((client) => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(broadcastData);
-          }
-        });
-      }
+      // Рассылаем всем подключенным устройствам в Wi-Fi
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify(reply));
+        }
+      });
     } catch (e) {
-      console.error("Ошибка обработки сообщения:", e);
+      console.log('Ошибка обработки сообщения:', e);
     }
+  });
+
+  ws.on('close', () => {
+    console.log('Кто-то отключился');
   });
 });
 
 // Запуск сервера на порту 3000
-server.listen(3000, () => {
-  console.log('Сервер успешно запущен на http://localhost:3000');
+server.listen(3000, '0.0.0.0', () => {
+  console.log('=== СЕРВЕР ЗАПУЩЕН НА ПОРТУ 3000 ===');
+  console.log('Теперь чат работает для всех в одной Wi-Fi сети!');
 });
