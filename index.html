@@ -92,10 +92,12 @@
 </div>
 
 <script>
-// Автоопределение: если запущен локально, то localhost, иначе — ссылка на Render
-const SERVER_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-  ? 'http://localhost:3000' 
-  : 'https://СЮДА_ВСТАВЬ_ССЫЛКУ_С_RENDER.onrender.com';
+// Автоопределение адреса твоего компьютера
+const currentHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+  ? 'localhost' 
+  : '192.168.1.5'; // <-- ВСТАВЬ СВОЙ IP СЮДА, ЕСЛИ ОН ДРУГОЙ
+
+const SERVER_URL = `http://${currentHost}:3000`;
 
 const DICTIONARIES = {
   ru: "время жизнь рука дело мир слово друг утро море небо солнце дождь снег ветер лед дом река гора поле книга стул стол окно дверь свет тень звук город дорога машина дерево птица трава человек душа песня голос огонь земля вода".split(' '),
