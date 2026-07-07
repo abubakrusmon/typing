@@ -7,115 +7,42 @@
   <title>Typing Speed Test — Abuabkr</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
     body {
       width: 100vw; height: 100vh;
       background: radial-gradient(circle at 50% 0%, #1e1e38 0%, #0d0e21 60%, #050512 100%);
       font-family: 'Segoe UI', Arial, sans-serif;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
-      color: #fff; overflow: hidden;
-      padding: 20px 15px;
+      color: #fff; overflow: hidden; padding: 20px 15px;
     }
-
-    #app { 
-      width: 100%; 
-      max-width: 1100px; 
-      height: 100%;
-      max-height: 800px;
-      display: flex; 
-      flex-direction: column; 
-      justify-content: space-between; 
-      position: relative; 
-    }
-
-    .user-panel {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      background: rgba(255, 255, 255, 0.03); padding: 6px 14px; border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.08); font-size: 14px;
-      align-self: center; margin-bottom: 10px;
-    }
+    #app { width: 100%; max-width: 1100px; height: 100%; max-height: 800px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+    .user-panel { display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255, 255, 255, 0.03); padding: 6px 14px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08); font-size: 14px; align-self: center; margin-bottom: 10px; }
     .logout-btn { background: none; border: none; color: #ff6b81; font-weight: 700; cursor: pointer; margin-left: 5px; }
-
     .stats-container { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; }
     .stat-box { text-align: center; flex: 1; }
     .stat-box .num { font-size: clamp(28px, 6vw, 46px); font-weight: 800; color: #7ee8fa; text-shadow: 0 0 10px rgba(126,232,250,0.3); }
     .stat-box .label { font-size: clamp(10px, 2.5vw, 11px); letter-spacing: 1px; color: #a5a9e8; text-transform: uppercase; margin-top: 4px; }
-
-    /* Окно просмотра: Прозрачный фон без масок */
-    #textViewport { 
-      position: relative; 
-      font-size: clamp(20px, 5.5vw, 32px); 
-      font-family: monospace; 
-      height: 145px; 
-      overflow: hidden; 
-      width: 100%; 
-      margin: 20px 0;
-    }
-    
-    #textInner { 
-      position: relative; 
-      display: flex; 
-      flex-wrap: wrap; 
-      line-height: 48px; 
-      pointer-events: none; 
-      transition: transform 0.2s ease; 
-      font-weight: 600; 
-      color: rgba(255, 255, 255, 0.2); 
-    }
+    #textViewport { position: relative; font-size: clamp(20px, 5.5vw, 32px); font-family: monospace; height: 145px; overflow: hidden; width: 100%; margin: 20px 0; }
+    #textInner { position: relative; display: flex; flex-wrap: wrap; line-height: 48px; pointer-events: none; transition: transform 0.2s ease; font-weight: 600; color: rgba(255, 255, 255, 0.2); }
     #textInner span { white-space: pre; display: inline-block; }
-    
-    .correct { 
-      color: #fff; 
-      text-shadow: 0 0 10px rgba(255,255,255,0.3); 
-    }
-    .wrong { 
-      color: #ff6b81; 
-      background: rgba(255,107,129,0.2); 
-      border-radius: 4px; 
-    }
-    
-    #caret { 
-      position: absolute; 
-      width: 2px; 
-      height: 32px; 
-      background: #7ee8fa; 
-      box-shadow: 0 0 8px #7ee8fa; 
-      transition: all 0.05s ease; 
-      transform: translateY(8px); 
-      animation: blink 1s infinite;
-    }
+    .correct { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+    .wrong { color: #ff6b81; background: rgba(255,107,129,0.2); border-radius: 4px; }
+    #caret { position: absolute; width: 2px; height: 32px; background: #7ee8fa; box-shadow: 0 0 8px #7ee8fa; transition: all 0.05s ease; transform: translateY(8px); animation: blink 1s infinite; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-    /* Исправленный инпут: теперь он спрятан глубоко на фоне и не мешает кликам */
     #hiddenInput { position: absolute; top: 0; left: 0; opacity: 0; width: 1px; height: 1px; z-index: -1; pointer-events: none; }
     #overlay { text-align: center; color: rgba(255,255,255,0.4); font-size: 13px; margin-top: -10px; margin-bottom: 10px; }
-
     .controls { display: flex; justify-content: center; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; z-index: 10; position: relative; }
     .btn { padding: 12px 16px; border-radius: 12px; font-size: 13px; cursor: pointer; background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.1); font-weight: 600; transition: 0.2s; }
     .btn.active { background: rgba(126,232,250,0.15); border-color: #7ee8fa; color: #7ee8fa; }
-    
-    /* Стили для нижней строки кнопок */
     .bottom-row { display: flex; justify-content: center; gap: 15px; width: 100%; z-index: 10; position: relative; }
     .btn-bottom { flex: 1; max-width: 200px; padding: 14px 20px !important; font-size: 14px !important; border-radius: 12px; cursor: pointer; font-weight: 600; transition: 0.2s; text-align: center; }
     .btn-chat { background: rgba(126,232,250,0.05); color: #7ee8fa; border: 1px solid rgba(126,232,250,0.3); }
-    .btn-chat:active { background: linear-gradient(135deg, #7ee8fa, #eec0c6); color: #0b0c1f; border-color: transparent; }
     .btn-leader { background: rgba(255, 215, 0, 0.05); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.3); }
-    .btn-leader:active { background: linear-gradient(135deg, #ffd700, #ffb300); color: #0b0c1f; border-color: transparent; }
-
-    /* Стили для модального окна рейтинга */
     #leaderboardModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 5, 18, 0.85); justify-content: center; align-items: center; z-index: 100; padding: 20px; }
     .modal-content { background: #17212b; border: 1px solid rgba(255,255,255,0.1); padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; }
     .modal-content h3 { color: #ffd700; margin-bottom: 15px; font-size: 18px; }
     .leader-list { text-align: left; margin-bottom: 15px; max-height: 220px; overflow-y: auto; }
     .leader-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
-
-    @media (min-width: 768px) {
-      #app { gap: 30px; justify-content: center; height: auto; }
-      .user-panel { position: absolute; top: -50px; right: 0; margin-bottom: 0; }
-      #textViewport { margin: 0; }
-      .btn { padding: 10px 18px; }
-      .btn-bottom { flex: none; width: auto; padding: 8px 20px !important; }
-    }
+    @media (min-width: 768px) { #app { gap: 30px; justify-content: center; height: auto; } .user-panel { position: absolute; top: -50px; right: 0; margin-bottom: 0; } #textViewport { margin: 0; } .btn { padding: 10px 18px; } .btn-bottom { flex: none; width: auto; padding: 8px 20px !important; } }
   </style>
 </head>
 <body>
@@ -139,7 +66,6 @@
   </div>
   
   <input id="hiddenInput" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
-  
   <div id="overlay">Тапни в любом месте и начни писать!</div>
 
   <div class="controls">
@@ -166,6 +92,11 @@
 </div>
 
 <script>
+// Автоопределение: если запущен локально, то localhost, иначе — ссылка на Render
+const SERVER_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+  ? 'http://localhost:3000' 
+  : 'https://СЮДА_ВСТАВЬ_ССЫЛКУ_С_RENDER.onrender.com';
+
 const DICTIONARIES = {
   ru: "время жизнь рука дело мир слово друг утро море небо солнце дождь снег ветер лед дом река гора поле книга стул стол окно дверь свет тень звук город дорога машина дерево птица трава человек душа песня голос огонь земля вода".split(' '),
   en: "process hand discovery artist thought practice noise experience change morning fox group way smell chair relation trust case quick stop book task machine speed shape world time life line sound light house water fire earth".split(' ')
@@ -211,11 +142,9 @@ function render() {
   if(span) {
     document.getElementById('caret').style.left = span.offsetLeft + 'px';
     document.getElementById('caret').style.top = span.offsetTop + 'px';
-    
     document.getElementById('caret').style.animation = 'none';
     void document.getElementById('caret').offsetWidth;
     document.getElementById('caret').style.animation = 'blink 1s infinite';
-
     const lineHeight = span.offsetHeight || 48;
     if(span.offsetTop > lineHeight) {
       document.getElementById('textInner').style.transform = `translateY(-${span.offsetTop - 10}px)`;
@@ -227,12 +156,10 @@ function render() {
 
 document.getElementById('hiddenInput').addEventListener('input', (e) => {
   typed = e.target.value;
-  
   if(typed.length > targetText.length) {
     typed = typed.substring(0, targetText.length);
     e.target.value = typed;
   }
-
   if(!active && typed.length > 0) {
     active = true;
     document.getElementById('overlay').style.display = 'none';
@@ -245,12 +172,10 @@ document.getElementById('hiddenInput').addEventListener('input', (e) => {
       }
     }, 1000);
   }
-  
   const correct = typed.split('').filter((c, i) => c === targetText[i]).length;
   const spentTime = (timeLimit - timeLeft) || 1;
   document.getElementById('wpmVal').textContent = Math.round((correct / 5) / (spentTime / 60));
   document.getElementById('accVal').textContent = typed.length ? Math.round((correct / typed.length) * 100) + '%' : '100%';
-  
   render();
 });
 
@@ -258,15 +183,13 @@ async function saveScore() {
   active = false;
   const correct = typed.split('').filter((c, i) => c === targetText[i]).length;
   const finalWpm = Math.round((correct / 5) / (timeLimit / 60));
-  
   try {
-    await fetch('http://localhost:3000/api/score', {
+    await fetch(`${SERVER_URL}/api/score`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: currentUsername, wpm: finalWpm })
     });
   } catch(e) {}
-  
   alert(`Тест окончен! Результат: ${finalWpm} WPM`);
   resetGame();
 }
@@ -303,7 +226,7 @@ async function openLeaderboard() {
   const list = document.getElementById('leaderList');
   list.innerHTML = "<div style='text-align:center;'>Загрузка...</div>";
   try {
-    const res = await fetch('http://localhost:3000/api/leaders');
+    const res = await fetch(`${SERVER_URL}/api/leaders`);
     const data = await res.json();
     if(!data.leaders || data.leaders.length === 0) {
       list.innerHTML = "<div style='text-align:center; color:#a5a9e8;'>Рекордов пока нет. Будь первым!</div>";
@@ -337,7 +260,6 @@ function focusInput() {
 
 document.addEventListener('click', (e) => {
   const modal = document.getElementById('leaderboardModal');
-  // Фокусируем ввод, только если клик пришелся мимо кнопок меню и модального окна
   if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && !e.target.classList.contains('btn-bottom') && (!modal || !modal.contains(e.target))) {
     focusInput();
   }
