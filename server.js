@@ -1,70 +1,77 @@
 const express = require('express');
+const http = require('http');
+const WebSocket = require('ws');
 const cors = require('cors');
-const bodyParser = require('body-parser');
-const { WebSocketServer } = require('ws'); // Подключаем WebSocket
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
-let globalLeaders = [];
-let chatMessages = []; // Тут храним историю чата
+// Массив для хранения истории последних 50 сообщений
+let messageHistory = [];
+// Массив для хранения рекордов (из твоего основного кода)
+let leaderboards = [];
 
-// Запись рекорда
+// API для сохранения рекордов скорости печати
 app.post('/api/score', (req, res) => {
   const { username, wpm } = req.body;
-  if (!username) return res.status(400).json({ success: false });
-
-  const existingPlayer = globalLeaders.find(p => p.name === username);
-  if (existingPlayer) {
-    if (wpm > existingPlayer.wpm) {
-      existingPlayer.wpm = wpm;
-    }
-  } else {
-    globalLeaders.push({ name: username, wpm: wpm });
-  }
-
-  globalLeaders.sort((a, b) => b.wpm - a.wpm);
-  res.json({ success: true, leaders: globalLeaders });
+  if (!username) return res.status(400).json({ error: 'No username' });
+  
+  leaderboards.push({ name: username, wpm: parseInt(wpm) || 0 });
+  leaderboards.sort((a, b) => b.wpm - a.wpm);
+  leaderboards = leaderboards.slice(0, 10); // оставляем топ-10
+  
+  res.json({ success: true });
 });
 
-// Получение рейтинга
+// API для получения таблицы лидеров
 app.get('/api/leaders', (req, res) => {
-  res.json({ leaders: globalLeaders });
+  res.json({ leaders: leaderboards });
 });
 
-// Запуск HTTP сервера
-const server = app.listen(3000, () => {
-  console.log('🚀 Сервер запущен на http://localhost:3000');
-});
-
-// НАСТРОЙКА WEBSOCKET ДЛЯ ЧАТА
-const wss = new WebSocketServer({ server });
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 
 wss.on('connection', (ws) => {
-  // Как только пользователь зашел — отправляем ему историю сообщений
-  ws.send(JSON.stringify({ type: 'history', messages: chatMessages }));
+  // При подключении нового пользователя отправляем ему историю чата
+  ws.send(JSON.stringify({
+    type: 'history',
+    messages: messageHistory
+  }));
 
-  ws.on('message', (data) => {
+  ws.on('message', (message) => {
     try {
-      const parsed = JSON.parse(data);
-      
-      if (parsed.type === 'message') {
-        const newMsg = { username: parsed.username, text: parsed.text };
-        chatMessages.push(newMsg); // Сохраняем в историю
+      const data = JSON.parse(message);
 
-        // Ограничим историю до 50 сообщений, чтобы не забивать память
-        if (chatMessages.length > 50) chatMessages.shift();
+      if (data.type === 'message') {
+        const newMsg = {
+          username: data.username || 'Аноним',
+          text: data.text
+        };
 
-        // Отправляем это сообщение ВООБЩЕ ВСЕМ подключенным пользователям
+        // Сохраняем в историю
+        messageHistory.push(newMsg);
+        if (messageHistory.length > 50) messageHistory.shift();
+
+        // Рассылаем сообщение ВСЕМ подключенным пользователям
+        const broadcastData = JSON.stringify({
+          type: 'new_message',
+          message: newMsg
+        });
+
         wss.clients.forEach((client) => {
-          if (client.readyState === 1) { // 1 означает OPEN
-            client.send(JSON.stringify({ type: 'new_message', message: newMsg }));
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(broadcastData);
           }
         });
       }
-    } catch (err) {
-      console.error('Ошибка обработки сообщения:', err);
+    } catch (e) {
+      console.error("Ошибка обработки сообщения:", e);
     }
   });
+});
+
+// Запуск сервера на порту 3000
+server.listen(3000, () => {
+  console.log('Сервер успешно запущен на http://localhost:3000');
 });

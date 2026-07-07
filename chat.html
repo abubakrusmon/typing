@@ -1,127 +1,112 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237ee8fa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3z'></path><path d='M6 21a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v12a3 3 0 0 0 3 3z'></path></svg>">
-<title>Чат участников</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  
-  body {
-    width: 100vw; height: 100vh; 
-    background: radial-gradient(circle at 50% 0%, #1e1e38 0%, #0d0e21 60%, #050512 100%);
-    font-family: 'Segoe UI', Arial, sans-serif;
-    display: flex; justify-content: center; align-items: center;
-    overflow: hidden;
-  }
-
-  /* Главный контейнер теперь полностью прозрачный, без рамок и жестких теней */
-  #chatContainer {
-    width: 95vw; height: 90vh; max-width: 1100px; 
-    background: transparent;
-    border: none;
-    display: flex; flex-direction: column;
-    overflow: hidden;
-  }
-
-  #chatHeader { 
-    padding: 20px 10px; /* Немного уменьшил падинги, чтобы подровнять под прозрачный стиль */
-    background: transparent; 
-    display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  }
-  .header-info { display: flex; flex-direction: column; gap: 4px; color: #7ee8fa; text-shadow: 0 0 10px rgba(126,232,250,0.3); }
-  .header-info h2 { font-size: 18px; font-weight: 700; }
-  .header-info .status { font-size: 13px; color: #a5a9e8; }
-  
-  .back-btn {
-    background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #a5a9e8; padding: 8px 16px; border-radius: 10px; font-size: 13px;
-    font-weight: 600; cursor: pointer; transition: 0.2s;
-    backdrop-filter: blur(5px);
-  }
-  .back-btn:hover { background: rgba(126,232,250,0.1); border-color: #7ee8fa; color: #fff; }
-
-  #chatMessages { 
-    flex: 1; padding: 30px 10px; 
-    overflow-y: auto; display: flex; flex-direction: column; gap: 14px;
-    background: transparent;
-    scroll-behavior: smooth;
-  }
-  
-  #chatMessages::-webkit-scrollbar { width: 6px; }
-  #chatMessages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-
-  /* Сообщения теперь плавают в воздухе с эффектом размытия заднего плана */
-  .chatMsg { 
-    padding: 12px 18px; border-radius: 16px; 
-    color: #fff; font-size: 15px; line-height: 1.4;
-    max-width: 70%; width: fit-content;
-    display: flex; flex-direction: column;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-    word-break: break-word;
+  <title>Чат участников</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     
-    /* Анимация плавного появления из воздуха */
-    opacity: 0;
-    transform: translateY(12px);
-    animation: floatIn 0.35s ease forwards;
-  }
-  
-  .chatMsg.otherMsg {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    align-self: flex-start;
-    border-bottom-left-radius: 4px;
-  }
-  
-  .chatMsg.myMsg {
-    background: rgba(126, 232, 250, 0.12);
-    border: 1px solid rgba(126, 232, 250, 0.25);
-    align-self: flex-end;
-    border-bottom-right-radius: 4px;
-  }
-
-  .chatMsg .uName { 
-    color: #eec0c6; font-weight: 600; font-size: 13px; 
-    margin-bottom: 4px; letter-spacing: 0.5px;
-  }
-  .chatMsg.myMsg .uName { color: #7ee8fa; }
-
-  #chatForm { 
-    padding: 20px 10px; display: flex; gap: 15px; 
-    background: transparent; align-items: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-  }
-  
-  #chatInput { 
-    flex: 1; padding: 16px 20px; 
-    background: rgba(255, 255, 255, 0.04); 
-    border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; 
-    color: #fff; outline: none; font-size: 15px;
-    backdrop-filter: blur(5px);
-    transition: 0.2s;
-  }
-  #chatInput:focus { border-color: rgba(126, 232, 250, 0.5); background: rgba(255, 255, 255, 0.07); }
-  
-  #chatSendBtn { 
-    background: linear-gradient(135deg, rgba(126, 232, 250, 0.2), rgba(238, 192, 198, 0.2)); 
-    border: 1px solid rgba(255, 255, 255, 0.15); color: #fff;
-    font-size: 14px; font-weight: 700; cursor: pointer;
-    padding: 16px 28px; border-radius: 12px; transition: 0.2s;
-    backdrop-filter: blur(5px);
-  }
-  #chatSendBtn:hover { transform: translateY(-1px); background: linear-gradient(135deg, rgba(126, 232, 250, 0.3), rgba(238, 192, 198, 0.3)); border-color: #7ee8fa; box-shadow: 0 4px 15px rgba(126,232,250,0.2); }
-
-  /* Ключевые кадры для выплывания сообщений */
-  @keyframes floatIn {
-    to {
-      opacity: 1;
-      transform: translateY(0);
+    body {
+      width: 100vw; height: 100vh; 
+      background: radial-gradient(circle at 50% 0%, #1e1e38 0%, #0d0e21 60%, #050512 100%);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      display: flex; justify-content: center; align-items: center;
+      overflow: hidden;
+      padding: 10px;
     }
-  }
-</style>
+
+    #chatContainer {
+      width: 100%; height: 100%; max-width: 1100px; 
+      background: transparent;
+      border: none;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+
+    #chatHeader { 
+      padding: 15px 10px; 
+      background: transparent; 
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      gap: 10px;
+    }
+    .header-info { display: flex; flex-direction: column; gap: 4px; color: #7ee8fa; text-shadow: 0 0 10px rgba(126,232,250,0.3); min-width: 0; }
+    .header-info h2 { font-size: clamp(14px, 4.5vw, 18px); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .header-info .status { font-size: clamp(11px, 3.5vw, 13px); color: #a5a9e8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    .back-btn {
+      background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #a5a9e8; padding: 8px 14px; border-radius: 10px; font-size: 12px;
+      font-weight: 600; cursor: pointer; transition: 0.2s;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .back-btn:hover, .back-btn:active { background: rgba(126,232,250,0.1); border-color: #7ee8fa; color: #fff; }
+
+    #chatMessages { 
+      flex: 1; padding: 20px 10px; 
+      overflow-y: auto; display: flex; flex-direction: column; gap: 14px;
+      background: transparent;
+      scroll-behavior: smooth;
+    }
+    
+    #chatMessages::-webkit-scrollbar { width: 4px; }
+    #chatMessages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+    .chatMsg { 
+      padding: 10px 16px; border-radius: 16px; 
+      color: #fff; font-size: 14px; line-height: 1.4;
+      max-width: 85%; width: fit-content;
+      display: flex; flex-direction: column;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      word-break: break-word;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: floatIn 0.35s ease forwards;
+    }
+    
+    .chatMsg.otherMsg { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); align-self: flex-start; border-bottom-left-radius: 4px; }
+    .chatMsg.myMsg { background: rgba(126, 232, 250, 0.12); border: 1px solid rgba(126, 232, 250, 0.25); align-self: flex-end; border-bottom-right-radius: 4px; }
+
+    .chatMsg .uName { color: #eec0c6; font-weight: 600; font-size: 12px; margin-bottom: 4px; letter-spacing: 0.5px; }
+    .chatMsg.myMsg .uName { color: #7ee8fa; }
+
+    #chatForm { 
+      padding: 15px 10px; display: flex; gap: 10px; 
+      background: transparent; align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    #chatInput { 
+      flex: 1; padding: 14px 16px; 
+      background: rgba(255, 255, 255, 0.04); 
+      border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; 
+      color: #fff; outline: none; font-size: 15px;
+      transition: 0.2s;
+    }
+    #chatInput:focus { border-color: rgba(126, 232, 250, 0.5); background: rgba(255, 255, 255, 0.07); }
+    
+    #chatSendBtn { 
+      background: linear-gradient(135deg, rgba(126, 232, 250, 0.2), rgba(238, 192, 198, 0.2)); 
+      border: 1px solid rgba(255, 255, 255, 0.15); color: #fff;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      padding: 14px 20px; border-radius: 12px; transition: 0.2s;
+    }
+    #chatSendBtn:hover, #chatSendBtn:active { background: linear-gradient(135deg, rgba(126, 232, 250, 0.3), rgba(238, 192, 198, 0.3)); border-color: #7ee8fa; }
+
+    @keyframes floatIn { to { opacity: 1; transform: translateY(0); } }
+
+    @media (min-width: 768px) {
+      body { padding: 30px; }
+      .chatMsg { max-width: 70%; font-size: 15px; }
+      #chatForm { padding: 20px 10px; gap: 15px; }
+      #chatInput { padding: 16px 20px; }
+      #chatSendBtn { padding: 16px 28px; font-size: 14px; }
+    }
+  </style>
 </head>
 <body>
 
@@ -131,7 +116,7 @@
       <h2>💬 Общий чат кликеров</h2>
       <div class="status" id="statusLine">Подключение к серверу...</div>
     </div>
-    <button class="back-btn" onclick="location.href='index.html'">⬅ Назад к тесту</button>
+    <button class="back-btn" onclick="location.href='index.html'">⬅ К тесту</button>
   </div>
   
   <div id="chatMessages"></div>
@@ -147,7 +132,12 @@ let currentUsername = localStorage.getItem('typing_user') || 'Аноним';
 let ws;
 
 function initChat() {
-ws = new WebSocket('wss://сгенерированное-слово.loca.lt');  
+  // Автоматически определяем текущий хост (IP или localhost), на котором запущен сайт
+  const currentHost = window.location.hostname || 'localhost';
+  
+  // Создаем подключение к порту 3000 твоего локального бэкенда
+  ws = new WebSocket(`ws://${currentHost}:3000`);  
+
   ws.onopen = () => {
     document.getElementById('statusLine').textContent = '● Онлайн (связь установлена)';
     document.getElementById('statusLine').style.color = '#8bf7a0';
@@ -174,7 +164,6 @@ function addMsg(m) {
   const box = document.getElementById('chatMessages');
   const isMe = m.username === currentUsername;
   
-  // Создаем элемент через createElement, чтобы CSS анимация срабатывала корректно для каждого нового сообщения
   const msgDiv = document.createElement('div');
   msgDiv.className = `chatMsg ${isMe ? 'myMsg' : 'otherMsg'}`;
   msgDiv.innerHTML = `
