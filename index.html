@@ -4,98 +4,508 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237ee8fa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3z'></path><path d='M6 21a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v12a3 3 0 0 0 3 3z'></path></svg>">
-  <title>Typing Speed Test — Abuabkr</title>
+  <title>Typing Speed Test Ultra Pro</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg-gradient: radial-gradient(circle at 50% 0%, #111122 0%, #060713 60%, #020205 100%);
+      --accent-color: #7ee8fa;
+      --accent-glow: rgba(126, 232, 250, 0.4);
+      --text-main: #ffffff;
+      --text-muted: rgba(255, 255, 255, 0.15);
+      --text-label: #a5a9e8;
+      --panel-bg: rgba(255, 255, 255, 0.02);
+      --panel-border: rgba(255, 255, 255, 0.05);
+      --wrong-color: #ff6b81;
+      --dropdown-bg: #0b0c16;
+    }
+
+    [data-theme="cyberpunk"] {
+      --bg-gradient: radial-gradient(circle at 50% 0%, #210b30 0%, #0e021a 60%, #040008 100%);
+      --accent-color: #ffee00;
+      --accent-glow: rgba(255, 238, 0, 0.3);
+      --text-main: #00ffff;
+      --text-muted: rgba(0, 255, 255, 0.12);
+      --text-label: #ff007f;
+      --panel-bg: rgba(255, 0, 127, 0.03);
+      --panel-border: rgba(255, 0, 127, 0.15);
+      --dropdown-bg: #0e021a;
+    }
+
+    [data-theme="carbon"] {
+      --bg-gradient: radial-gradient(circle at 50% 0%, #1a1a1a 0%, #0e0e0e 60%, #050505 100%);
+      --accent-color: #e5e5e5;
+      --accent-glow: rgba(229, 229, 229, 0.15);
+      --text-main: #ffffff;
+      --text-muted: rgba(255, 255, 255, 0.1);
+      --text-label: #777777;
+      --panel-bg: rgba(255, 255, 255, 0.01);
+      --panel-border: rgba(255, 255, 255, 0.04);
+      --dropdown-bg: #0e0e0e;
+    }
+
+    [data-theme="sakura"] {
+      --bg-gradient: radial-gradient(circle at 50% 0%, #2d131e 0%, #16060d 60%, #0a0106 100%);
+      --accent-color: #ffb7c5;
+      --accent-glow: rgba(255, 183, 197, 0.3);
+      --text-main: #ffe3e8;
+      --text-muted: rgba(255, 183, 197, 0.12);
+      --text-label: #ff85a2;
+      --panel-bg: rgba(255, 133, 162, 0.03);
+      --panel-border: rgba(255, 133, 162, 0.15);
+      --dropdown-bg: #16060d;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+    
     body {
       width: 100vw; height: 100vh;
-      background: radial-gradient(circle at 50% 0%, #1e1e38 0%, #0d0e21 60%, #050512 100%);
-      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg-gradient);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
-      color: #fff; overflow: hidden; padding: 20px 15px;
+      color: var(--text-main); overflow: hidden; padding: 20px 15px;
+      transition: background 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 0;
+      animation: fadeInPage 0.8s forwards, organicBreath 8s infinite alternate ease-in-out;
     }
-    #app { width: 100%; max-width: 1100px; height: 100%; max-height: 800px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-    .user-panel { display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255, 255, 255, 0.03); padding: 6px 14px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08); font-size: 14px; align-self: center; margin-bottom: 10px; }
-    .logout-btn { background: none; border: none; color: #ff6b81; font-weight: 700; cursor: pointer; margin-left: 5px; }
-    .stats-container { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; }
-    .stat-box { text-align: center; flex: 1; }
-    .stat-box .num { font-size: clamp(28px, 6vw, 46px); font-weight: 800; color: #7ee8fa; text-shadow: 0 0 10px rgba(126,232,250,0.3); }
-    .stat-box .label { font-size: clamp(10px, 2.5vw, 11px); letter-spacing: 1px; color: #a5a9e8; text-transform: uppercase; margin-top: 4px; }
-    #textViewport { position: relative; font-size: clamp(20px, 5.5vw, 32px); font-family: monospace; height: 145px; overflow: hidden; width: 100%; margin: 20px 0; }
-    #textInner { position: relative; display: flex; flex-wrap: wrap; line-height: 48px; pointer-events: none; transition: transform 0.2s ease; font-weight: 600; color: rgba(255, 255, 255, 0.2); }
-    #textInner span { white-space: pre; display: inline-block; }
-    .correct { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
-    .wrong { color: #ff6b81; background: rgba(255,107,129,0.2); border-radius: 4px; }
-    #caret { position: absolute; width: 2px; height: 32px; background: #7ee8fa; box-shadow: 0 0 8px #7ee8fa; transition: all 0.05s ease; transform: translateY(8px); animation: blink 1s infinite; }
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    @keyframes fadeInPage { to { opacity: 1; } }
+
+    /* Живое дыхание заднего фона */
+    @keyframes organicBreath {
+      0% { background-size: 100% 100%; }
+      100% { background-size: 110% 110%; }
+    }
+
+    /* Кинематографическая виньетка */
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.4) 100%);
+      pointer-events: none; z-index: 1; opacity: 0; transition: opacity 1s ease;
+    }
+    body.zen-mode::before { opacity: 1; }
+
+    /* Интерактивная 3D Сетка на фоне */
+    #bgGrid {
+      position: fixed; inset: 0; z-index: 0;
+      background-image: 
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 50px 50px;
+      background-position: center;
+      transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+      transition: transform 0.5s cubic-bezier(0.1, 0.8, 0.3, 1);
+      pointer-events: none;
+    }
+
+    /* Премиальный кастомный курсор */
+    #customCursor {
+      position: fixed; width: 6px; height: 6px;
+      background: var(--accent-color); border-radius: 50%;
+      pointer-events: none; z-index: 10000;
+      transform: translate(-50%, -50%);
+      transition: width 0.15s, height 0.15s, background-color 0.15s;
+      box-shadow: 0 0 12px var(--accent-color);
+    }
+    #customCursorHalo {
+      position: fixed; width: 28px; height: 28px;
+      border: 1px solid var(--accent-color); opacity: 0.35;
+      border-radius: 50%; pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%);
+      will-change: transform, width, height;
+      transition: width 0.25s, height 0.25s, opacity 0.2s, border-color 0.2s;
+    }
+
+    .hover-active #customCursor { width: 4px; height: 4px; background: #fff; }
+    .hover-active #customCursorHalo { width: 38px; height: 38px; opacity: 0.65; border-color: #fff; }
+
+    /* Контейнер искр */
+    #sparkleContainer {
+      position: absolute; inset: 0; pointer-events: none; z-index: 5;
+    }
+    .sparkle {
+      position: absolute; width: 4px; height: 4px; border-radius: 50%;
+      background: var(--accent-color);
+      box-shadow: 0 0 8px var(--accent-color);
+      pointer-events: none;
+      animation: flyOut 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+    }
+    @keyframes flyOut {
+      to { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+    }
+
+    #app { 
+      width: 100%; max-width: 1100px; height: 100%; max-height: 850px; 
+      display: flex; flex-direction: column; justify-content: space-between; 
+      position: relative; z-index: 2;
+      transition: opacity 0.5s ease;
+    }
+
+    /* Режим фокуса (Zen Mode) */
+    .zen-mode .top-bar, 
+    .zen-mode .controls, 
+    .zen-mode .bottom-row,
+    .zen-mode #handsContainer {
+      opacity: 0.01;
+      pointer-events: none;
+      transition: opacity 1s ease;
+    }
+    .top-bar, .controls, .bottom-row, #handsContainer {
+      transition: opacity 0.4s ease;
+    }
+    
+    .top-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 10px; gap: 10px; flex-wrap: wrap; }
+    .user-panel { display: flex; align-items: center; gap: 8px; background: var(--panel-bg); padding: 8px 16px; border-radius: 16px; border: 1px solid var(--panel-border); font-size: 13px; backdrop-filter: blur(12px); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2); }
+    .logout-btn { background: none; border: none; color: var(--wrong-color); font-weight: 700; margin-left: 5px; }
+    
+    .top-controls { display: flex; gap: 10px; align-items: center; z-index: 999; }
+    
+    .custom-select-wrapper { position: relative; user-select: none; width: 145px; }
+    .custom-select-trigger {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 14px; font-size: 13px; font-weight: 600;
+      color: var(--text-main); background: var(--panel-bg);
+      border: 1px solid var(--panel-border); border-radius: 16px;
+      backdrop-filter: blur(12px); transition: 0.3s;
+    }
+    .custom-select-trigger:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--accent-color); }
+    .custom-select-trigger::after { content: '▾'; font-size: 11px; margin-left: 8px; color: var(--text-label); transition: transform 0.2s; }
+    .custom-select-wrapper.open .custom-select-trigger::after { transform: rotate(180deg); }
+    .custom-options {
+      position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+      background: var(--dropdown-bg); border: 1px solid var(--panel-border);
+      border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+      opacity: 0; visibility: hidden; transform: translateY(-8px);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1000; overflow: hidden; padding: 6px;
+    }
+    .custom-select-wrapper.open .custom-options { opacity: 1; visibility: visible; transform: translateY(0); }
+    .custom-option {
+      padding: 8px 12px; font-size: 13px; font-weight: 600;
+      color: var(--text-main); border-radius: 10px; transition: 0.15s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .custom-option:hover { background: rgba(255, 255, 255, 0.05); color: var(--accent-color); }
+    .custom-option.active { background: var(--panel-bg); border: 1px solid var(--panel-border); color: var(--accent-color); box-shadow: 0 0 12px var(--accent-glow); }
+
+    .sound-toggle { background: var(--panel-bg); border: 1px solid var(--panel-border); padding: 8px 14px; border-radius: 16px; color: var(--text-main); font-size: 13px; transition: 0.2s; outline: none; backdrop-filter: blur(12px); }
+    .sound-toggle:hover { background: rgba(255,255,255,0.05); }
+
+    .stats-container { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; position: relative; }
+    .stat-box { text-align: center; flex: 1; position: relative; }
+    .stat-box .num { font-size: clamp(28px, 6vw, 46px); font-weight: 800; color: var(--accent-color); text-shadow: 0 0 10px var(--accent-glow); transition: transform 0.2s ease, color 0.3s; }
+    
+    .stat-box.fire .num {
+      animation: firePulse 1s infinite alternate;
+      color: #ffaa00;
+      text-shadow: 0 0 20px rgba(255, 170, 0, 0.6);
+    }
+    @keyframes firePulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.08); }
+    }
+
+    .stat-box .label { font-size: clamp(10px, 2.5vw, 11px); letter-spacing: 1px; color: var(--text-label); text-transform: uppercase; margin-top: 4px; }
+    
+    .progress-wrapper { width: 100%; height: 3px; background: rgba(255,255,255,0.02); border-radius: 2px; margin-top: 12px; overflow: hidden; }
+    #progressBar { width: 100%; height: 100%; background: var(--accent-color); box-shadow: 0 0 12px var(--accent-color); transition: width 1s linear; }
+
+    #streakCounter {
+      text-align: center; font-size: 14px; font-weight: 700; color: var(--accent-color);
+      opacity: 0; transform: translateY(10px); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      height: 20px; margin-bottom: -10px; text-transform: uppercase; letter-spacing: 1px;
+    }
+    #streakCounter.visible { opacity: 1; transform: translateY(0); }
+
+    #textViewport { 
+      position: relative; font-size: clamp(26px, 6.5vw, 38px); 
+      font-family: 'Courier New', monospace; height: 180px; 
+      overflow: hidden; width: 100%; margin: 25px 0; 
+    }
+    
+    #textInner { 
+      position: relative; display: flex; flex-wrap: wrap; line-height: 56px; 
+      pointer-events: none; will-change: transform; font-weight: 600; 
+      color: var(--text-muted); transform: translate3d(0, 0, 0);
+      backface-visibility: hidden;
+      transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    #textInner span { white-space: pre; display: inline-block; transition: color 0.08s ease; will-change: color; }
+    
+    .correct { color: var(--text-main); text-shadow: 0 0 12px rgba(255,255,255,0.4); }
+    .wrong { color: var(--wrong-color); }
+    
+    #caret { 
+      position: absolute; width: 3px; height: 36px; 
+      background: var(--accent-color); box-shadow: 0 0 15px var(--accent-color); 
+      will-change: transform; transform: translate3d(0, 0, 0); backface-visibility: hidden;
+      transition: transform 0.08s cubic-bezier(0.19, 1, 0.22, 1); animation: blink 1.2s infinite; 
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.15; } }
+    
     #hiddenInput { position: absolute; top: 0; left: 0; opacity: 0; width: 1px; height: 1px; z-index: -1; pointer-events: none; }
-    #overlay { text-align: center; color: rgba(255,255,255,0.4); font-size: 13px; margin-top: -10px; margin-bottom: 10px; }
+    
+    #overlay { text-align: center; color: var(--text-muted); font-size: 14px; margin-top: -10px; margin-bottom: 10px; font-weight: 500; letter-spacing: 0.5px; }
+    #capsWarning { display: none; text-align: center; color: var(--wrong-color); font-size: 13px; margin-top: -10px; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; animation: pulse 1.5s infinite; }
+    
+    /* СТИЛИ ПРЕМИАЛЬНЫХ ВИРТУАЛЬНЫХ РУК С ЭФФЕКТОМ КЛИКА */
+    #handsContainer {
+      display: flex; justify-content: center; gap: 80px;
+      margin: 10px auto; opacity: 0.8; height: 110px;
+      transition: opacity 0.3s, max-height 0.3s, margin 0.3s;
+      max-height: 110px; overflow: hidden;
+    }
+    #handsContainer.hidden {
+      max-height: 0; margin: 0; opacity: 0; pointer-events: none;
+    }
+    .hand-svg {
+      width: 140px; height: 110px;
+    }
+    .finger-node {
+      fill: rgba(255, 255, 255, 0.08);
+      stroke: rgba(255, 255, 255, 0.15);
+      stroke-width: 1.5px;
+      transition: fill 0.2s, stroke 0.2s, r 0.2s, cy 0.1s cubic-bezier(0.1, 0.8, 0.3, 1), filter 0.2s;
+    }
+    .hand-path {
+      stroke: rgba(255, 255, 255, 0.05);
+      stroke-width: 1.5px;
+      fill: none;
+    }
+    /* Свечение активного пальца */
+    .finger-node.active {
+      fill: var(--accent-color);
+      stroke: var(--accent-color);
+      r: 7.5px;
+      filter: drop-shadow(0 0 6px var(--accent-color));
+      animation: fingerPulse 0.8s infinite alternate;
+    }
+    /* Физическая симуляция клика при зажатии */
+    .finger-node.active.clicked {
+      cy: var(--click-y) !important;
+      r: 5px !important;
+      transition: cy 0.05s, r 0.05s;
+    }
+
+    @keyframes fingerPulse {
+      0% { filter: drop-shadow(0 0 3px var(--accent-color)); r: 7px; }
+      100% { filter: drop-shadow(0 0 10px var(--accent-color)); r: 8.5px; }
+    }
+
     .controls { display: flex; justify-content: center; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; z-index: 10; position: relative; }
-    .btn { padding: 12px 16px; border-radius: 12px; font-size: 13px; cursor: pointer; background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.1); font-weight: 600; transition: 0.2s; }
-    .btn.active { background: rgba(126,232,250,0.15); border-color: #7ee8fa; color: #7ee8fa; }
+    
+    /* Дорогой эффект блика (Border Glow) на кнопках */
+    .btn, .sound-toggle { 
+      position: relative;
+      padding: 10px 18px; border-radius: 16px; font-size: 13px; 
+      background: var(--panel-bg); color: var(--text-main); 
+      border: 1px solid var(--panel-border); font-weight: 600; 
+      transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
+      backdrop-filter: blur(12px);
+      overflow: hidden;
+    }
+    .btn::before, .sound-toggle::before {
+      content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+      transition: 0.5s; pointer-events: none;
+    }
+    .btn:hover::before, .sound-toggle:hover::before {
+      left: 100%;
+    }
+    .btn:hover, .sound-toggle:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--accent-color); transform: translateY(-1.5px); }
+    .btn.active { background: var(--panel-bg); border-color: var(--accent-color); color: var(--accent-color); box-shadow: 0 0 12px var(--accent-glow); }
+    
     .bottom-row { display: flex; justify-content: center; gap: 15px; width: 100%; z-index: 10; position: relative; }
-    .btn-bottom { flex: 1; max-width: 200px; padding: 14px 20px !important; font-size: 14px !important; border-radius: 12px; cursor: pointer; font-weight: 600; transition: 0.2s; text-align: center; }
-    .btn-chat { background: rgba(126,232,250,0.05); color: #7ee8fa; border: 1px solid rgba(126,232,250,0.3); }
-    .btn-leader { background: rgba(255, 215, 0, 0.05); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.3); }
-    #leaderboardModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 5, 18, 0.85); justify-content: center; align-items: center; z-index: 100; padding: 20px; }
-    .modal-content { background: #17212b; border: 1px solid rgba(255,255,255,0.1); padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; }
-    .modal-content h3 { color: #ffd700; margin-bottom: 15px; font-size: 18px; }
+    .btn-bottom { flex: 1; max-width: 200px; padding: 14px 20px !important; font-size: 14px !important; border-radius: 16px; font-weight: 600; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); text-align: center; backdrop-filter: blur(12px); position: relative; overflow: hidden; }
+    .btn-bottom:hover { transform: translateY(-3px); }
+    .btn-chat { background: rgba(126,232,250,0.03); color: #7ee8fa; border: 1px solid rgba(126,232,250,0.2); }
+    .btn-leader { background: rgba(255, 215, 0, 0.03); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.2); }
+    
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(3, 3, 8, 0.85); justify-content: center; align-items: center; z-index: 101; padding: 20px; backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s ease; }
+    .modal.open { display: flex; opacity: 1; }
+    .modal-content { background: #0b0c16; border: 1px solid var(--panel-border); padding: 30px; border-radius: 24px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.8); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    .modal.open .modal-content { transform: scale(1); }
+    .modal-content h3 { color: var(--accent-color); margin-bottom: 20px; font-size: 20px; letter-spacing: 0.5px; }
+    
     .leader-list { text-align: left; margin-bottom: 15px; max-height: 220px; overflow-y: auto; }
-    .leader-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
-    @media (min-width: 768px) { #app { gap: 30px; justify-content: center; height: auto; } .user-panel { position: absolute; top: -50px; right: 0; margin-bottom: 0; } #textViewport { margin: 0; } .btn { padding: 10px 18px; } .btn-bottom { flex: none; width: auto; padding: 8px 20px !important; } }
+    .leader-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 14px; }
+    
+    .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
+    .result-card { background: rgba(255,255,255,0.01); padding: 14px; border-radius: 16px; border: 1px solid var(--panel-border); }
+    .result-card .res-val { font-size: 26px; font-weight: 800; color: var(--accent-color); }
+    .result-card .res-lbl { font-size: 11px; color: var(--text-label); margin-top: 4px; text-transform: uppercase; }
+    
+    #customTextArea { width: 100%; height: 120px; background: rgba(0,0,0,0.4); border: 1px solid var(--panel-border); border-radius: 16px; color: #fff; padding: 12px; font-family: monospace; font-size: 14px; resize: none; margin-bottom: 15px; outline: none; }
+    #customTextArea:focus { border-color: var(--accent-color); }
+
+    .toast-notification {
+      position: fixed; top: 30px; left: 50%; transform: translate(-50%, -20px);
+      background: rgba(11, 12, 22, 0.95); border: 1px solid var(--accent-color); box-shadow: 0 10px 30px var(--accent-glow);
+      color: #fff; padding: 12px 24px; border-radius: 16px; font-weight: 700; font-size: 14px; z-index: 9999;
+      opacity: 0; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;
+    }
+    .toast-notification.active { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (min-width: 768px) { #app { gap: 20px; justify-content: center; height: auto; } .top-bar { position: absolute; top: -60px; left: 0; width: 100%; } #textViewport { margin: 0; } .btn-bottom { flex: none; width: auto; padding: 10px 24px !important; } }
   </style>
 </head>
 <body>
 
+<div id="bgGrid"></div>
+
+<div id="customCursor"></div>
+<div id="customCursorHalo"></div>
+
+<div id="sparkleContainer"></div>
+
+<div id="toast" class="toast-notification"></div>
+
 <div id="app">
-  <div class="user-panel">
-    👤 <span id="profileUser" style="color: #7ee8fa; font-weight: bold;"></span>
-    <button class="logout-btn" onclick="logout()">Выйти</button>
+  <div class="top-bar">
+    <div class="user-panel interactive">
+      👤 <span id="profileUser" style="color: var(--accent-color); font-weight: bold;"></span>
+      <button class="logout-btn interactive" onclick="logout()">Выйти</button>
+    </div>
+    
+    <div class="top-controls">
+      <div class="custom-select-wrapper" id="soundProfileWrapper" style="width: 140px;">
+        <div class="custom-select-trigger interactive" id="soundProfileTrigger">🎹 MX Brown</div>
+        <div class="custom-options" id="soundProfileOptions">
+          <div class="custom-option interactive active" data-sound="mx">🎹 MX Brown</div>
+          <div class="custom-option interactive" data-sound="digital">⚡ Digital</div>
+          <div class="custom-option interactive" data-sound="membrane">☁️ Membrane</div>
+        </div>
+      </div>
+
+      <div class="custom-select-wrapper" id="themeSelectWrapper">
+        <div class="custom-select-trigger interactive" id="themeSelectTrigger">🌌 Space</div>
+        <div class="custom-options" id="themeSelectOptions">
+          <div class="custom-option interactive" data-value="default">🌌 Space</div>
+          <div class="custom-option interactive" data-value="cyberpunk">⚡ Cyberpunk</div>
+          <div class="custom-option interactive" data-value="carbon">⚫ Carbon</div>
+          <div class="custom-option interactive" data-value="sakura">🌸 Sakura</div>
+        </div>
+      </div>
+
+      <button class="sound-toggle interactive" id="soundBtn" onclick="toggleSound()">🔊 Звук: ВКЛ</button>
+    </div>
   </div>
 
-  <div class="stats-container">
-    <div class="stat-box"><div class="num" id="wpmVal">0</div><div class="label">WPM</div></div>
-    <div class="stat-box"><div class="num" id="accVal">100%</div><div class="label">Точность</div></div>
-    <div class="stat-box"><div class="num" id="errVal">0</div><div class="label">Ошибки</div></div>
-    <div class="stat-box"><div class="num" id="timeVal">15</div><div class="label">Секунд</div></div>
+  <div>
+    <div class="stats-container">
+      <div class="stat-box" id="wpmBox"><div class="num" id="wpmVal">0</div><div class="label">WPM</div></div>
+      <div class="stat-box"><div class="num" id="accVal">100%</div><div class="label">Точность</div></div>
+      <div class="stat-box"><div class="num" id="errVal">0</div><div class="label">Ошибки</div></div>
+      <div class="stat-box"><div class="num" id="timeVal">15</div><div class="label">Секунд</div></div>
+    </div>
+    <div class="progress-wrapper">
+      <div id="progressBar"></div>
+    </div>
   </div>
+
+  <div id="streakCounter">⚡ 0 БЕЗ ОШИБОК</div>
 
   <div id="textViewport">
     <div id="textInner"></div>
     <div id="caret"></div>
   </div>
+
+  <div id="handsContainer">
+    <svg class="hand-svg" viewBox="0 0 140 110">
+      <path class="hand-path" d="M10,100 C15,85 20,80 35,80 C50,80 60,95 70,100" />
+      <circle id="f_L_pinky" class="finger-node" cx="15" cy="45" r="5" style="--click-y: 53px" />
+      <circle id="f_L_ring" class="finger-node" cx="35" cy="25" r="5" style="--click-y: 33px" />
+      <circle id="f_L_middle" class="finger-node" cx="58" cy="15" r="5" style="--click-y: 23px" />
+      <circle id="f_L_index" class="finger-node" cx="80" cy="22" r="5" style="--click-y: 30px" />
+      <circle id="f_L_thumb" class="finger-node" cx="115" cy="65" r="5" style="--click-y: 71px" />
+      <line x1="15" y1="45" x2="35" y2="80" stroke="rgba(255,255,255,0.05)" stroke-width="1.5" />
+      <line x1="35" y1="25" x2="42" y2="80" stroke="rgba(255,255,255,0.05)" stroke-width="1.5" />
+      <line x1="58" y1="15" x2="50" y2="80" stroke="rgba(255,255,255,0.05)" stroke-width="1.5" />
+      <line x1="80" y1="22" x2="58" y2="80" stroke="rgba(255,255,255,0.05)" stroke-width="1.5" />
+      <line x1="115" y1="65" x2="68" y2="92" stroke="rgba(255,255,255,0.05)" stroke-width="1.5" />
+    </svg>
+    <svg class="hand-svg" viewBox="0 0 140 110">
+      <path class="hand-path" d="M130,100 C125,85 120,80 105,80 C90,80 80,95 70,100" />
+      <circle id="f_R_thumb" class="finger-node" cx="25" cy="65" r="5" style="--click-y: 71px" />
+      <circle id="f_R_index" class="finger-node" cx="60" cy="22" r="5" style="--click-y: 30px" />
+      <circle id="f_R_middle" class="finger-node" cx="82" cy="15" r="5" style="--click-y: 23px" />
+      <circle id="f_R_ring" class="finger-node" cx="105" cy="25" r="5" style="--click-y: 33px" />
+      <circle id="f_R_pinky" class="finger-node" cx="125" cy="45" r="5" style="--click-y: 53px" />
+      <line x1="25" y1="65" x2="72" y2="92" stroke="rgba(255,255,255,0.05)" stroke-width="1.5" />
+      <line x1="60" y1="22" x2="82" y2="80" stroke="rgba(255,255,255,0.05)" stroke-width="1.5" />
+      <line x1="82" y1="15" x2="90" y2="80" stroke="rgba(255,255,255,0.05)" stroke-width="1.5" />
+      <line x1="105" y1="25" x2="98" y2="80" stroke="rgba(255,255,255,0.05)" stroke-width="1.5" />
+      <line x1="125" y1="45" x2="105" y2="80" stroke="rgba(255,255,255,0.05)" stroke-width="1.5" />
+    </svg>
+  </div>
   
   <input id="hiddenInput" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
-  <div id="overlay">Тапни в любом месте и начни писать!</div>
+  <div id="overlay">Начни печатать! (Esc — мгновенный рестарт)</div>
+  <div id="capsWarning">⚠️ Caps Lock включен!</div>
 
   <div class="controls">
-    <button class="btn time-btn active" data-t="15" onclick="changeTime(15, this)">15 сек</button>
-    <button class="btn time-btn" data-t="30" onclick="changeTime(30, this)">30 сек</button>
-    <button class="btn time-btn" data-t="60" onclick="changeTime(60, this)">60 сек</button>
-    <button class="btn lang-btn" data-l="ru" onclick="changeLang('ru', this)">Русский</button>
-    <button class="btn lang-btn active" data-l="en" onclick="changeLang('en', this)">English</button>
-    <button class="btn" id="restartBtn" onclick="resetGame()">🔄 Сброс</button>
+    <button class="btn time-btn active interactive" data-t="15" onclick="changeTime(15, this)">15 сек</button>
+    <button class="btn time-btn interactive" data-t="30" onclick="changeTime(30, this)">30 сек</button>
+    <button class="btn time-btn interactive" data-t="60" onclick="changeTime(60, this)">60 сек</button>
+    <button class="btn lang-btn interactive" data-l="ru" onclick="changeLang('ru', this)">Русский</button>
+    <button class="btn lang-btn active interactive" data-l="en" onclick="changeLang('en', this)">English</button>
+    <button class="btn interactive" onclick="openCustomModal()">✏️ Свой текст</button>
+    <button class="btn interactive" id="handsToggleBtn" onclick="toggleHandsDisplay()">⌨️ Руки: ВКЛ</button>
+    <button class="btn interactive" id="restartBtn" onclick="resetGame()">🔄 Сброс</button>
   </div>
 
   <div class="bottom-row">
-    <button class="btn-bottom btn-chat" id="chatOpenBtn" onclick="location.href='chat.html'">💬 Чат</button>
-    <button class="btn-bottom btn-leader" onclick="openLeaderboard()">🏆 Рейтинг</button>
+    <button class="btn-bottom btn-chat interactive" id="chatOpenBtn" onclick="location.href='chat.html'">💬 Чат</button>
+    <button class="btn-bottom btn-leader interactive" onclick="openLeaderboard()">🏆 Рейтинг</button>
   </div>
 </div>
 
-<div id="leaderboardModal">
+<div id="leaderboardModal" class="modal">
   <div class="modal-content">
     <h3>🏆 Таблица лидеров</h3>
     <div class="leader-list" id="leaderList">Загрузка...</div>
-    <button class="btn" onclick="closeLeaderboard()" style="width: 100%;">Закрыть</button>
+    <button class="btn interactive" onclick="closeModal('leaderboardModal')" style="width: 100%;">Закрыть</button>
+  </div>
+</div>
+
+<div id="customModal" class="modal">
+  <div class="modal-content">
+    <h3>✏️ Свой текст для тренировки</h3>
+    <textarea id="customTextArea" placeholder="Вставьте сюда любой текст..."></textarea>
+    <div style="display: flex; gap: 10px;">
+      <button class="btn interactive" onclick="applyCustomText()" style="flex: 1;">Применить</button>
+      <button class="btn interactive" onclick="closeModal('customModal')" style="flex: 1; background: rgba(255,255,255,0.05);">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<div id="resultsModal" class="modal">
+  <div class="modal-content">
+    <h3>📊 Результаты теста</h3>
+    <div class="results-grid">
+      <div class="result-card">
+        <div class="res-val" id="resWpm">0</div>
+        <div class="res-lbl">WPM</div>
+      </div>
+      <div class="result-card">
+        <div class="res-val" id="resAcc">100%</div>
+        <div class="res-lbl">Точность</div>
+      </div>
+      <div class="result-card">
+        <div class="res-val" id="resCorrect">0</div>
+        <div class="res-lbl">Символов</div>
+      </div>
+      <div class="result-card">
+        <div class="res-val" id="resErrors" style="color: var(--wrong-color);">0</div>
+        <div class="res-lbl">Ошибки</div>
+      </div>
+    </div>
+    <button class="btn interactive" onclick="closeModal('resultsModal')" style="width: 100%; background: var(--accent-color); color: #000; text-shadow: none;">Продолжить (Esc)</button>
   </div>
 </div>
 
 <script>
-// Автоопределение адреса твоего компьютера
 const currentHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
   ? 'localhost' 
-  : '192.168.1.5'; // <-- ВСТАВЬ СВОЙ IP СЮДА, ЕСЛИ ОН ДРУГОЙ
+  : '192.168.1.5'; 
 
 const SERVER_URL = `http://${currentHost}:3000`;
 
@@ -106,6 +516,11 @@ const DICTIONARIES = {
 
 let currentLang = 'en'; 
 let currentUsername = localStorage.getItem('typing_user') || '';
+let soundEnabled = localStorage.getItem('sound_enabled') !== 'false';
+let handsVisible = localStorage.getItem('hands_visible') !== 'false';
+let activeSoundPack = localStorage.getItem('sound_pack') || 'mx';
+let customText = '';
+let currentStreak = 0;
 
 if (!currentUsername) {
   currentUsername = prompt("Введите ваш никнейм:") || "Аноним";
@@ -115,56 +530,469 @@ document.getElementById('profileUser').textContent = currentUsername;
 
 let targetText = '', typed = '', timeLimit = 15, timeLeft = 15, timer = null, active = false;
 
-function generateText() {
-  let res = [];
-  const dict = DICTIONARIES[currentLang];
-  for(let i=0; i<350; i++) res.push(dict[Math.floor(Math.random()*dict.length)]);
-  targetText = res.join(' ');
-  typed = '';
-  document.getElementById('hiddenInput').value = '';
-  document.getElementById('textInner').style.transform = 'translateY(0px)';
-  render();
+document.getElementById('soundBtn').textContent = soundEnabled ? "🔊 Звук: ВКЛ" : "🔇 Звук: ВЫКЛ";
+
+if (!handsVisible) {
+  document.getElementById('handsContainer').classList.add('hidden');
+  document.getElementById('handsToggleBtn').textContent = "⌨️ Руки: ВЫКЛ";
 }
 
-function render() {
-  let html = '';
-  let errors = 0;
-  for(let i=0; i<targetText.length; i++) {
-    if(i < typed.length) {
-      html += `<span class="${typed[i] === targetText[i] ? 'correct' : 'wrong'}">${targetText[i]}</span>`;
-      if(typed[i] !== targetText[i]) errors++;
-    } else {
-      html += `<span>${targetText[i]}</span>`;
+const FINGER_MAP = {
+  'q': 'f_L_pinky', 'a': 'f_L_pinky', 'z': 'f_L_pinky', '1': 'f_L_pinky', 'й': 'f_L_pinky', 'ф': 'f_L_pinky', 'я': 'f_L_pinky',
+  'w': 'f_L_ring', 's': 'f_L_ring', 'x': 'f_L_ring', '2': 'f_L_ring', 'ц': 'f_L_ring', 'ы': 'f_L_ring', 'ч': 'f_L_ring',
+  'e': 'f_L_middle', 'd': 'f_L_middle', 'c': 'f_L_middle', '3': 'f_L_middle', 'у': 'f_L_middle', 'в': 'f_L_middle', 'с': 'f_L_middle',
+  'r': 'f_L_index', 't': 'f_L_index', 'f': 'f_L_index', 'g': 'f_L_index', 'v': 'f_L_index', 'b': 'f_L_index', '4': 'f_L_index', '5': 'f_L_index',
+  'к': 'f_L_index', 'е': 'f_L_index', 'а': 'f_L_index', 'п': 'f_L_index', 'м': 'f_L_index', 'и': 'f_L_index',
+  ' ': 'f_L_thumb',
+  'y': 'f_R_index', 'u': 'f_R_index', 'h': 'f_R_index', 'j': 'f_R_index', 'n': 'f_R_index', 'm': 'f_R_index', '6': 'f_R_index', '7': 'f_R_index',
+  'н': 'f_R_index', 'г': 'f_R_index', 'о': 'f_R_index', 'р': 'f_R_index', 'т': 'f_R_index', 'ь': 'f_R_index',
+  'i': 'f_R_middle', 'k': 'f_R_middle', ',': 'f_R_middle', '8': 'f_R_middle', 'ш': 'f_R_middle', 'л': 'f_R_middle', 'б': 'f_R_middle',
+  'o': 'f_R_ring', 'l': 'f_R_ring', '.': 'f_R_ring', '9': 'f_R_ring', 'щ': 'f_R_ring', 'д': 'f_R_ring', 'ю': 'f_R_ring',
+  'p': 'f_R_pinky', ';': 'f_R_pinky', '/': 'f_R_pinky', '[': 'f_R_pinky', ']': 'f_R_pinky', '0': 'f_R_pinky', '-': 'f_R_pinky', '=': 'f_R_pinky',
+  'з': 'f_R_pinky', 'х': 'f_R_pinky', 'ъ': 'f_R_pinky', 'ж': 'f_R_pinky', 'э': 'f_R_pinky'
+};
+
+function highlightActiveFinger() {
+  document.querySelectorAll('.finger-node').forEach(node => node.classList.remove('active', 'clicked'));
+  if (typed.length >= targetText.length) return;
+  
+  const nextChar = targetText[typed.length].toLowerCase();
+  const activeFingerId = FINGER_MAP[nextChar];
+  
+  if (activeFingerId) {
+    const fingerElement = document.getElementById(activeFingerId);
+    if (fingerElement) {
+      fingerElement.classList.add('active');
+      if (nextChar === ' ') {
+        document.getElementById('f_R_thumb').classList.add('active');
+      }
     }
   }
-  document.getElementById('textInner').innerHTML = html;
+}
+
+// 3D Параллакс-эффект наведения на сетку фона
+document.addEventListener('mousemove', (e) => {
+  const grid = document.getElementById('bgGrid');
+  const xAxis = (window.innerWidth / 2 - e.clientX) / 45;
+  const yAxis = (window.innerHeight / 2 - e.clientY) / 45;
+  grid.style.transform = `perspective(1000px) rotateY(${xAxis}deg) rotateX(${-yAxis}deg)`;
+});
+
+// Магнитные кнопки (Magnetic Hover)
+const magneticButtons = document.querySelectorAll('.interactive, .btn, .btn-bottom');
+magneticButtons.forEach(btn => {
+  btn.addEventListener('mousemove', (e) => {
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width/2;
+    const y = e.clientY - rect.top - rect.height/2;
+    btn.style.transform = `translate(${x * 0.25}px, ${y * 0.25}px)`;
+  });
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transform = `translate(0px, 0px)`;
+  });
+});
+
+// Кастомный селектор тем
+const selectWrapper = document.getElementById('themeSelectWrapper');
+const selectTrigger = document.getElementById('themeSelectTrigger');
+const selectOptions = document.getElementById('themeSelectOptions');
+const optionElements = document.querySelectorAll('.custom-option[data-value]');
+
+selectTrigger.addEventListener('click', (e) => {
+  e.stopPropagation();
+  selectWrapper.classList.toggle('open');
+});
+
+optionElements.forEach(option => {
+  option.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const val = this.getAttribute('data-value');
+    changeTheme(val);
+    selectWrapper.classList.remove('open');
+  });
+});
+
+function changeTheme(themeName) {
+  if (themeName === 'default') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', themeName);
+  }
+  localStorage.setItem('app_theme', themeName);
+  
+  optionElements.forEach(opt => {
+    if (opt.getAttribute('data-value') === themeName) {
+      opt.classList.add('active');
+      selectTrigger.textContent = opt.textContent;
+    } else {
+      opt.classList.remove('active');
+    }
+  });
+  focusInput();
+}
+changeTheme(localStorage.getItem('app_theme') || 'default');
+
+// Кастомный селектор звуков
+const soundWrapper = document.getElementById('soundProfileWrapper');
+const soundTrigger = document.getElementById('soundProfileTrigger');
+const soundOptions = document.querySelectorAll('.custom-option[data-sound]');
+
+soundTrigger.addEventListener('click', (e) => {
+  e.stopPropagation();
+  soundWrapper.classList.toggle('open');
+});
+
+soundOptions.forEach(option => {
+  option.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const soundPack = this.getAttribute('data-sound');
+    activeSoundPack = soundPack;
+    localStorage.setItem('sound_pack', soundPack);
+    
+    soundOptions.forEach(opt => opt.classList.remove('active'));
+    this.classList.add('active');
+    soundTrigger.textContent = this.textContent;
+    soundWrapper.classList.remove('open');
+    focusInput();
+  });
+});
+
+// Синхронизация селектора звуков при старте
+soundOptions.forEach(opt => {
+  if (opt.getAttribute('data-sound') === activeSoundPack) {
+    opt.classList.add('active');
+    soundTrigger.textContent = opt.textContent;
+  }
+});
+
+// Премиальный Hi-Fi Синтезатор Звуков
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playTypingSound(isError, isSpace = false) {
+  if (!soundEnabled) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+    
+    osc.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    if (isError) {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(250, audioCtx.currentTime);
+      gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.15);
+      return;
+    }
+
+    if (activeSoundPack === 'mx') {
+      // Имитация упругого механического клика (MX Brown)
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(isSpace ? 150 : 280 + Math.random() * 100, audioCtx.currentTime);
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(1000, audioCtx.currentTime);
+      gainNode.gain.setValueAtTime(isSpace ? 0.12 : 0.07, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.002, audioCtx.currentTime + (isSpace ? 0.09 : 0.05));
+    } else if (activeSoundPack === 'digital') {
+      // Имитация футуристичного клика
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1200 + Math.random() * 500, audioCtx.currentTime);
+      filter.type = 'highpass';
+      filter.frequency.setValueAtTime(1500, audioCtx.currentTime);
+      gainNode.gain.setValueAtTime(0.03, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+    } else {
+      // Бесшумный мембранный (Мягкий хлопок)
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(isSpace ? 100 : 180 + Math.random() * 40, audioCtx.currentTime);
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(400, audioCtx.currentTime);
+      gainNode.gain.setValueAtTime(0.18, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+    }
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.1);
+  } catch(e) {}
+}
+
+// Звуковой триумф (звон колокольчика на финише)
+function playFinishBell() {
+  if (!soundEnabled) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, audioCtx.currentTime); // Ля 2-й октавы
+    gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+    
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.8);
+  } catch(e) {}
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  localStorage.setItem('sound_enabled', soundEnabled);
+  document.getElementById('soundBtn').textContent = soundEnabled ? "🔊 Звук: ВКЛ" : "🔇 Звук: ВЫКЛ";
+  focusInput();
+}
+
+// Инерционный премиум-курсор
+const cursor = document.getElementById('customCursor');
+const cursorHalo = document.getElementById('customCursorHalo');
+let mouseX = -100, mouseY = -100;
+let haloX = -100, haloY = -100;
+
+document.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  cursor.style.left = mouseX + 'px';
+  cursor.style.top = mouseY + 'px';
+  
+  document.body.classList.remove('zen-mode');
+  resetZenTimer();
+});
+
+function animateHalo() {
+  const dx = mouseX - haloX;
+  const dy = mouseY - haloY;
+  
+  // Эффект сглаживания инерции (Inertia Trail)
+  haloX += dx * 0.12;
+  haloY += dy * 0.12;
+  
+  cursorHalo.style.left = haloX + 'px';
+  cursorHalo.style.top = haloY + 'px';
+  
+  // Легкое растяжение курсора при движении
+  const speed = Math.min(Math.sqrt(dx*dx + dy*dy) * 0.05, 1.3);
+  cursorHalo.style.transform = `translate(-50%, -50%) scale(${1 + speed * 0.15})`;
+
+  requestAnimationFrame(animateHalo);
+}
+animateHalo();
+
+document.addEventListener('mouseover', (e) => {
+  if (e.target.classList.contains('interactive') || e.target.tagName === 'BUTTON' || e.target.classList.contains('btn') || e.target.classList.contains('custom-option')) {
+    document.body.classList.add('hover-active');
+  } else {
+    document.body.classList.remove('hover-active');
+  }
+});
+
+// Генератор премиум-искр при идеальном вводе
+function createSparks(x, y) {
+  const container = document.getElementById('sparkleContainer');
+  for (let i = 0; i < 8; i++) {
+    const sparkle = document.createElement('div');
+    sparkle.className = 'sparkle';
+    sparkle.style.left = x + 'px';
+    sparkle.style.top = y + 'px';
+    
+    // Случайный разлет по физике
+    const dx = (Math.random() - 0.5) * 80;
+    const dy = (Math.random() - 0.5) * 80;
+    sparkle.style.setProperty('--dx', `${dx}px`);
+    sparkle.style.setProperty('--dy', `${dy}px`);
+    
+    container.appendChild(sparkle);
+    setTimeout(() => sparkle.remove(), 600);
+  }
+}
+
+// Zen Mode
+let zenTimer;
+function resetZenTimer() {
+  clearTimeout(zenTimer);
+  if (active) {
+    zenTimer = setTimeout(() => {
+      document.body.classList.add('zen-mode');
+    }, 3000);
+  }
+}
+
+function generateText() {
+  if (customText) {
+    targetText = customText;
+  } else {
+    let res = [];
+    const dict = DICTIONARIES[currentLang];
+    for(let i=0; i<250; i++) res.push(dict[Math.floor(Math.random()*dict.length)]);
+    targetText = res.join(' ');
+  }
+  typed = '';
+  currentStreak = 0;
+  updateStreakUI();
+  document.getElementById('hiddenInput').value = '';
+  document.getElementById('textInner').style.transform = 'translate3d(0, 0, 0)';
+  
+  const fragment = document.createDocumentFragment();
+  for(let i=0; i<targetText.length; i++) {
+    const span = document.createElement('span');
+    span.textContent = targetText[i];
+    fragment.appendChild(span);
+  }
+  const textInner = document.getElementById('textInner');
+  textInner.innerHTML = '';
+  textInner.appendChild(fragment);
+  
+  document.getElementById('progressBar').style.transition = 'none';
+  document.getElementById('progressBar').style.width = '100%';
+  
+  render(true);
+}
+
+// Рендеринг и анимации рук
+function render(forceAll = false) {
+  const spans = document.getElementById('textInner').children;
+  if (!spans.length) return;
+
+  const currentIdx = Math.min(typed.length, targetText.length - 1);
+  let errors = 0;
+  
+  if (forceAll) {
+    for(let i=0; i<targetText.length; i++) {
+      if(i < typed.length) {
+        const isCorrect = typed[i] === targetText[i];
+        spans[i].className = isCorrect ? 'correct' : 'wrong';
+        if(!isCorrect) errors++;
+      } else {
+        spans[i].className = '';
+      }
+    }
+  } else {
+    const lastIdx = typed.length - 1;
+    if (lastIdx >= 0 && lastIdx < targetText.length) {
+      const isCorrect = typed[lastIdx] === targetText[lastIdx];
+      spans[lastIdx].className = isCorrect ? 'correct' : 'wrong';
+      
+      if (isCorrect) {
+        currentStreak++;
+      } else {
+        currentStreak = 0;
+      }
+      updateStreakUI();
+    }
+    if (typed.length < targetText.length) {
+      spans[typed.length].className = '';
+    }
+    
+    for(let i=0; i<typed.length; i++) {
+      if(typed[i] !== targetText[i]) errors++;
+    }
+  }
+  
   document.getElementById('errVal').textContent = errors;
   
-  const span = document.getElementById('textInner').children[typed.length];
+  const span = spans[currentIdx];
   if(span) {
-    document.getElementById('caret').style.left = span.offsetLeft + 'px';
-    document.getElementById('caret').style.top = span.offsetTop + 'px';
-    document.getElementById('caret').style.animation = 'none';
-    void document.getElementById('caret').offsetWidth;
-    document.getElementById('caret').style.animation = 'blink 1s infinite';
-    const lineHeight = span.offsetHeight || 48;
-    if(span.offsetTop > lineHeight) {
-      document.getElementById('textInner').style.transform = `translateY(-${span.offsetTop - 10}px)`;
+    const caret = document.getElementById('caret');
+    let x = span.offsetLeft;
+    let y = span.offsetTop;
+    
+    if (typed.length >= targetText.length) {
+      x = span.offsetLeft + span.offsetWidth;
+    }
+    
+    const lineHeight = 56;
+    const caretHeight = 36;
+    const verticalOffset = (lineHeight - caretHeight) / 2;
+    
+    caret.style.transform = `translate3d(${x}px, ${y + verticalOffset}px, 0)`;
+    
+    caret.style.animation = 'none';
+    void caret.offsetWidth; 
+    caret.style.animation = 'blink 1.2s infinite';
+    
+    // Создаем искры при успешном комбо
+    if (!forceAll && currentStreak > 15 && typed.length > 0) {
+      const rect = caret.getBoundingClientRect();
+      createSparks(rect.left, rect.top + 18);
+    }
+    
+    if (y >= lineHeight) {
+      const offset = y - lineHeight;
+      document.getElementById('textInner').style.transform = `translate3d(0, -${offset}px, 0)`;
     } else {
-      document.getElementById('textInner').style.transform = 'translateY(0px)';
+      document.getElementById('textInner').style.transform = 'translate3d(0, 0, 0)';
     }
   }
+  
+  if (handsVisible) {
+    highlightActiveFinger();
+  }
+}
+
+function updateStreakUI() {
+  const streakEl = document.getElementById('streakCounter');
+  if (currentStreak >= 5) {
+    streakEl.textContent = `🔥 ${currentStreak} БЕЗ ОШИБОК`;
+    streakEl.classList.add('visible');
+  } else {
+    streakEl.classList.remove('visible');
+  }
+}
+
+function toggleHandsDisplay() {
+  handsVisible = !handsVisible;
+  localStorage.setItem('hands_visible', handsVisible);
+  const container = document.getElementById('handsContainer');
+  const btn = document.getElementById('handsToggleBtn');
+  
+  if (handsVisible) {
+    container.classList.remove('hidden');
+    btn.textContent = "⌨️ Руки: ВКЛ";
+    highlightActiveFinger();
+  } else {
+    container.classList.add('hidden');
+    btn.textContent = "⌨️ Руки: ВЫКЛ";
+    document.querySelectorAll('.finger-node').forEach(node => node.classList.remove('active'));
+  }
+  focusInput();
 }
 
 document.getElementById('hiddenInput').addEventListener('input', (e) => {
+  const lastCharIdx = e.target.value.length - 1;
+  const isCorrect = e.target.value[lastCharIdx] === targetText[lastCharIdx];
+  const isSpace = e.target.value[lastCharIdx] === ' ';
+  
+  playTypingSound(!isCorrect, isSpace);
+
+  // Эффект физического клика на виртуальном пальце
+  if (handsVisible && typed.length < targetText.length) {
+    const activeFinger = document.querySelector('.finger-node.active');
+    if (activeFinger) {
+      activeFinger.classList.add('clicked');
+      setTimeout(() => activeFinger.classList.remove('clicked'), 80);
+    }
+  }
+
   typed = e.target.value;
   if(typed.length > targetText.length) {
     typed = typed.substring(0, targetText.length);
     e.target.value = typed;
   }
+  
   if(!active && typed.length > 0) {
     active = true;
     document.getElementById('overlay').style.display = 'none';
+    
+    document.getElementById('progressBar').style.transition = `width ${timeLimit}s linear`;
+    document.getElementById('progressBar').style.width = '0%';
+
+    resetZenTimer();
+
     timer = setInterval(() => {
       timeLeft--;
       document.getElementById('timeVal').textContent = timeLeft;
@@ -174,17 +1002,59 @@ document.getElementById('hiddenInput').addEventListener('input', (e) => {
       }
     }, 1000);
   }
+  
+  resetZenTimer();
+
   const correct = typed.split('').filter((c, i) => c === targetText[i]).length;
   const spentTime = (timeLimit - timeLeft) || 1;
-  document.getElementById('wpmVal').textContent = Math.round((correct / 5) / (spentTime / 60));
+  const currentWpm = Math.round((correct / 5) / (spentTime / 60));
+  
+  document.getElementById('wpmVal').textContent = currentWpm;
   document.getElementById('accVal').textContent = typed.length ? Math.round((correct / typed.length) * 100) + '%' : '100%';
-  render();
+  
+  const wpmBox = document.getElementById('wpmBox');
+  if (currentWpm >= 80) {
+    wpmBox.classList.add('fire');
+  } else {
+    wpmBox.classList.remove('fire');
+  }
+
+  render(false);
 });
+
+// Закрываем выпадающие списки при клике снаружи
+document.addEventListener('click', (e) => {
+  if (!selectWrapper.contains(e.target)) selectWrapper.classList.remove('open');
+  if (!soundWrapper.contains(e.target)) soundWrapper.classList.remove('open');
+});
+
+// Детектор Caps Lock
+document.addEventListener('keydown', (e) => {
+  const capsWarning = document.getElementById('capsWarning');
+  if (e.getModifierState && e.getModifierState('CapsLock')) {
+    capsWarning.style.display = 'block';
+  } else {
+    capsWarning.style.display = 'none';
+  }
+});
+
+function showAutoToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.add('active');
+  setTimeout(() => { toast.classList.remove('active'); }, 3000);
+}
 
 async function saveScore() {
   active = false;
+  document.body.classList.remove('zen-mode');
+  playFinishBell(); // Торжественный финишный колокол!
+  
   const correct = typed.split('').filter((c, i) => c === targetText[i]).length;
   const finalWpm = Math.round((correct / 5) / (timeLimit / 60));
+  const accuracy = typed.length ? Math.round((correct / typed.length) * 100) : 100;
+  const errors = typed.length - correct;
+
   try {
     await fetch(`${SERVER_URL}/api/score`, {
       method: 'POST',
@@ -192,18 +1062,25 @@ async function saveScore() {
       body: JSON.stringify({ username: currentUsername, wpm: finalWpm })
     });
   } catch(e) {}
-  alert(`Тест окончен! Результат: ${finalWpm} WPM`);
-  resetGame();
+  
+  document.getElementById('resWpm').textContent = finalWpm;
+  document.getElementById('resAcc').textContent = accuracy + '%';
+  document.getElementById('resCorrect').textContent = correct;
+  document.getElementById('resErrors').textContent = errors >= 0 ? errors : 0;
+  
+  openModal('resultsModal');
 }
 
 function resetGame() {
   clearInterval(timer);
   timeLeft = timeLimit;
   active = false;
+  document.body.classList.remove('zen-mode');
   document.getElementById('timeVal').textContent = timeLeft;
   document.getElementById('wpmVal').textContent = '0';
   document.getElementById('accVal').textContent = '100%';
   document.getElementById('errVal').textContent = '0';
+  document.getElementById('wpmBox').classList.remove('fire');
   document.getElementById('overlay').style.display = 'block';
   generateText();
   focusInput();
@@ -217,37 +1094,70 @@ function changeTime(sec, el) {
 }
 
 function changeLang(lang, el) {
+  customText = '';
   document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
   el.classList.add('active');
   currentLang = lang;
   resetGame();
 }
 
+function openCustomModal() {
+  openModal('customModal');
+  document.getElementById('customTextArea').focus();
+}
+
+function applyCustomText() {
+  const text = document.getElementById('customTextArea').value.trim();
+  if (text.length > 5) {
+    customText = text;
+    showAutoToast("Ваш текст успешно загружен!");
+  } else {
+    customText = '';
+  }
+  closeModal('customModal');
+  resetGame();
+}
+
 async function openLeaderboard() {
-  document.getElementById('leaderboardModal').style.display = 'flex';
+  openModal('leaderboardModal');
   const list = document.getElementById('leaderList');
   list.innerHTML = "<div style='text-align:center;'>Загрузка...</div>";
   try {
     const res = await fetch(`${SERVER_URL}/api/leaders`);
     const data = await res.json();
     if(!data.leaders || data.leaders.length === 0) {
-      list.innerHTML = "<div style='text-align:center; color:#a5a9e8;'>Рекордов пока нет. Будь первым!</div>";
+      list.innerHTML = "<div style='text-align:center; color:var(--text-label);'>Рекордов пока нет!</div>";
     } else {
       list.innerHTML = data.leaders.map((p, idx) => `
         <div class="leader-item">
           <span>${idx + 1}. ${p.name}</span>
-          <span style="color: #7ee8fa; font-weight: bold;">${p.wpm} WPM</span>
+          <span style="color: var(--accent-color); font-weight: bold;">${p.wpm} WPM</span>
         </div>
       `).join('');
     }
   } catch (e) {
-    list.innerHTML = "<div style='text-align:center; color:#ff6b81;'>Ошибка загрузки. Сервер запущен?</div>";
+    list.innerHTML = "<div style='text-align:center; color:var(--wrong-color);'>Сервер рекордов оффлайн</div>";
   }
 }
 
-function closeLeaderboard() {
-  document.getElementById('leaderboardModal').style.display = 'none';
-  focusInput();
+function openModal(id) {
+  const m = document.getElementById(id);
+  m.style.display = 'flex';
+  void m.offsetWidth;
+  m.classList.add('open');
+}
+
+function closeModal(id) {
+  const m = document.getElementById(id);
+  m.classList.remove('open');
+  setTimeout(() => {
+    m.style.display = 'none';
+    if(id === 'resultsModal') {
+      resetGame();
+    } else {
+      focusInput();
+    }
+  }, 300);
 }
 
 function logout() {
@@ -260,9 +1170,24 @@ function focusInput() {
   input.focus();
 }
 
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('resultsModal').classList.contains('open')) {
+      closeModal('resultsModal');
+    } else if (document.getElementById('customModal').classList.contains('open')) {
+      closeModal('customModal');
+    } else if (document.getElementById('leaderboardModal').classList.contains('open')) {
+      closeModal('leaderboardModal');
+    } else {
+      resetGame();
+    }
+  }
+});
+
 document.addEventListener('click', (e) => {
-  const modal = document.getElementById('leaderboardModal');
-  if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && !e.target.classList.contains('btn-bottom') && (!modal || !modal.contains(e.target))) {
+  const isModalOpen = Array.from(document.querySelectorAll('.modal')).some(m => m.classList.contains('open'));
+  const isDropdownClick = selectWrapper.contains(e.target) || soundWrapper.contains(e.target);
+  if(!isModalOpen && !isDropdownClick && e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && !e.target.classList.contains('btn-bottom')) {
     focusInput();
   }
 });
